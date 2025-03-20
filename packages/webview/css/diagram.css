@@ -1,0 +1,26 @@
+svg {
+    outline: none; /* removes border when clicking into diagram */
+}
+
+.sprotty-node {
+    fill: var(--vscode-background);
+    stroke: var(--vscode-foreground);
+}
+
+.sprotty-node.mouseover:not(.selected) {
+    stroke-width: 3;
+}
+
+.sprotty-node.selected {
+    stroke-width: 2;
+}
+
+.sprotty-edge {
+    fill: none;
+    stroke: var(--vscode-editorActiveLineNumber-foreground);
+    stroke-width: 2;
+}
+
+.sprotty-label {
+    fill: var(--vscode-foreground);
+}

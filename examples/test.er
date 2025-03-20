@@ -1,0 +1,11 @@
+entity Entity4 {
+    attr
+}
+
+entity Entity3 {
+    attr
+}
+
+relationship Rel {
+    Entity4 -> Entity3
+}
