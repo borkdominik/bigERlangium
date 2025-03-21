@@ -99,6 +99,10 @@
                 {
                     "command": "biger.diagram.export",
                     "when": "er-diagram-focused"
+                },
+                {
+                    "command": "biger.diagram.delete",
+                    "when": "er-diagram-focused"
                 }
             ],
             "editor/context": [
@@ -122,7 +126,27 @@
                     "group": "navigation"
                 }
             ]
-        }
+        },
+        "keybindings": [
+            {
+                "key": "ctrl+f",
+                "mac": "cmd+f",
+                "command": "biger.diagram.fit",
+                "when": "er-diagram-focused"
+            },
+            {
+                "key": "ctrl+c",
+                "mac": "cmd+c",
+                "command": "biger.diagram.center",
+                "when": "er-diagram-focused"
+            },
+            {
+                "key": "ctrl+backspace",
+                "mac": "cmd+backspace",
+                "command": "biger.diagram.delete",
+                "when": "er-diagram-focused"
+            }
+        ]
     },
     "activationEvents": [
         "onLanguage:entity-relationship"
