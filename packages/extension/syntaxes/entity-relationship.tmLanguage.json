@@ -11,7 +11,7 @@
     },
     {
       "name": "keyword.control.entity-relationship",
-      "match": "\\b(entity|relationship)\\b"
+      "match": "\\b(0\\.\\.N|1\\.\\.N|N|bachman|chen|crowfoot|default|derived|entity|erdiagram|extends|key|multivalued|none|notation|optional|package|partial_key|private|protected|public|relationship|uml|weak)\\b|\\B(-o)\\b|\\b(o-)\\B"
     },
     {
       "name": "string.quoted.double.entity-relationship",

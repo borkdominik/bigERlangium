@@ -10,6 +10,8 @@ import { AbstractAstReflection } from 'langium';
 export const EntityRelationshipTerminals = {
     WS: /\s+/,
     ID: /[_a-zA-Z][\w_]*/,
+    INT: /[0-9]+/,
+    STRING: /"(\\.|[^"\\])*"|'(\\.|[^'\\])*'/,
     ML_COMMENT: /\/\*[\s\S]*?\*\//,
     SL_COMMENT: /\/\/[^\n\r]*/,
 };
@@ -17,18 +19,62 @@ export const EntityRelationshipTerminals = {
 export type EntityRelationshipTerminalNames = keyof typeof EntityRelationshipTerminals;
 
 export type EntityRelationshipKeywordNames = 
+    | "#"
+    | "("
+    | ")"
+    | "*-"
+    | "+"
+    | ","
+    | "-"
+    | "-*"
     | "->"
+    | "-o"
+    | "0..1"
+    | "0..N"
+    | "1"
+    | "1..1"
+    | "1..N"
+    | ":"
+    | "="
+    | "N"
+    | "["
+    | "]"
+    | "bachman"
+    | "chen"
+    | "crowfoot"
+    | "default"
+    | "derived"
     | "entity"
+    | "erdiagram"
+    | "extends"
+    | "key"
+    | "multivalued"
+    | "none"
+    | "notation"
+    | "o-"
+    | "optional"
+    | "package"
+    | "partial_key"
+    | "private"
+    | "protected"
+    | "public"
     | "relationship"
+    | "uml"
+    | "weak"
     | "{"
-    | "}";
+    | "|"
+    | "}"
+    | "~";
 
 export type EntityRelationshipTokenNames = EntityRelationshipTerminalNames | EntityRelationshipKeywordNames;
 
 export interface Attribute extends AstNode {
-    readonly $container: Entity;
+    readonly $container: Entity | Relationship;
     readonly $type: 'Attribute';
+    datatype?: DataType;
     name: string;
+    type?: AttributeType;
+    visibility?: VisibilityType;
 }
 
 export const Attribute = 'Attribute';
@@ -37,11 +83,60 @@ export function isAttribute(item: unknown): item is Attribute {
     return reflection.isInstance(item, Attribute);
 }
 
+export interface AttributeType extends AstNode {
+    readonly $container: Attribute;
+    readonly $type: 'AttributeType';
+    ATTR_NONE?: 'none';
+    DERIVED?: 'derived';
+    KEY?: 'key';
+    MULTIVALUED?: 'multivalued';
+    OPTIONAL?: 'optional';
+    PARTIAL_KEY?: 'partial_key';
+}
+
+export const AttributeType = 'AttributeType';
+
+export function isAttributeType(item: unknown): item is AttributeType {
+    return reflection.isInstance(item, AttributeType);
+}
+
+export interface CardinalityType extends AstNode {
+    readonly $container: RelationEntity;
+    readonly $type: 'CardinalityType';
+    CARD_NONE?: 'none';
+    MANY?: '1..N' | 'N';
+    ONE?: '1' | '1..1';
+    ZERO_OR_MORE?: '0..N';
+    ZERO_OR_ONE?: '0..1';
+}
+
+export const CardinalityType = 'CardinalityType';
+
+export function isCardinalityType(item: unknown): item is CardinalityType {
+    return reflection.isInstance(item, CardinalityType);
+}
+
+export interface DataType extends AstNode {
+    readonly $container: Attribute;
+    readonly $type: 'DataType';
+    d?: number;
+    size?: number;
+    type: string;
+}
+
+export const DataType = 'DataType';
+
+export function isDataType(item: unknown): item is DataType {
+    return reflection.isInstance(item, DataType);
+}
+
 export interface Entity extends AstNode {
     readonly $container: Model;
     readonly $type: 'Entity';
     attributes: Array<Attribute>;
+    extends?: Reference<Entity>;
     name: string;
+    weak: boolean;
 }
 
 export const Entity = 'Entity';
@@ -53,6 +148,8 @@ export function isEntity(item: unknown): item is Entity {
 export interface Model extends AstNode {
     readonly $type: 'Model';
     entities: Array<Entity>;
+    name: string;
+    notation?: NotationOption;
     relationships: Array<Relationship>;
 }
 
@@ -62,12 +159,59 @@ export function isModel(item: unknown): item is Model {
     return reflection.isInstance(item, Model);
 }
 
+export interface NotationOption extends AstNode {
+    readonly $container: Model;
+    readonly $type: 'NotationOption';
+    notationType: NotationType;
+}
+
+export const NotationOption = 'NotationOption';
+
+export function isNotationOption(item: unknown): item is NotationOption {
+    return reflection.isInstance(item, NotationOption);
+}
+
+export interface NotationType extends AstNode {
+    readonly $container: NotationOption;
+    readonly $type: 'NotationType';
+    BACHMAN?: 'bachman';
+    CHEN?: 'chen';
+    CROWSFOOT?: 'crowfoot';
+    NOTA_DEFAULT?: 'default';
+    UML?: 'uml';
+}
+
+export const NotationType = 'NotationType';
+
+export function isNotationType(item: unknown): item is NotationType {
+    return reflection.isInstance(item, NotationType);
+}
+
+export interface RelationEntity extends AstNode {
+    readonly $container: Relationship;
+    readonly $type: 'RelationEntity';
+    cardinality?: CardinalityType;
+    entity: Reference<Entity>;
+    role?: string;
+}
+
+export const RelationEntity = 'RelationEntity';
+
+export function isRelationEntity(item: unknown): item is RelationEntity {
+    return reflection.isInstance(item, RelationEntity);
+}
+
 export interface Relationship extends AstNode {
     readonly $container: Model;
     readonly $type: 'Relationship';
+    attributes: Array<Attribute>;
     name: string;
-    source: Reference<Entity>;
-    target: Reference<Entity>;
+    secondaryTargets: Array<RelationEntity>;
+    secondaryTypes: Array<RelationshipType>;
+    source: RelationEntity;
+    target: RelationEntity;
+    type: RelationshipType;
+    weak: boolean;
 }
 
 export const Relationship = 'Relationship';
@@ -76,17 +220,57 @@ export function isRelationship(item: unknown): item is Relationship {
     return reflection.isInstance(item, Relationship);
 }
 
+export interface RelationshipType extends AstNode {
+    readonly $container: Relationship;
+    readonly $type: 'RelationshipType';
+    AGGREGATION_LEFT?: 'o-';
+    AGGREGATION_RIGHT?: '-o';
+    COMPOSITION_LEFT?: '*-';
+    COMPOSITION_RIGHT?: '-*';
+    RELA_DEFAULT?: '->';
+}
+
+export const RelationshipType = 'RelationshipType';
+
+export function isRelationshipType(item: unknown): item is RelationshipType {
+    return reflection.isInstance(item, RelationshipType);
+}
+
+export interface VisibilityType extends AstNode {
+    readonly $container: Attribute;
+    readonly $type: 'VisibilityType';
+    PACKAGE?: 'package' | '~';
+    PRIVATE?: '-' | 'private';
+    PROTECTED?: '#' | 'protected';
+    PUBLIC?: '+' | 'public';
+    VISI_NONE?: 'none';
+}
+
+export const VisibilityType = 'VisibilityType';
+
+export function isVisibilityType(item: unknown): item is VisibilityType {
+    return reflection.isInstance(item, VisibilityType);
+}
+
 export type EntityRelationshipAstType = {
     Attribute: Attribute
+    AttributeType: AttributeType
+    CardinalityType: CardinalityType
+    DataType: DataType
     Entity: Entity
     Model: Model
+    NotationOption: NotationOption
+    NotationType: NotationType
+    RelationEntity: RelationEntity
     Relationship: Relationship
+    RelationshipType: RelationshipType
+    VisibilityType: VisibilityType
 }
 
 export class EntityRelationshipAstReflection extends AbstractAstReflection {
 
     getAllTypes(): string[] {
-        return [Attribute, Entity, Model, Relationship];
+        return [Attribute, AttributeType, CardinalityType, DataType, Entity, Model, NotationOption, NotationType, RelationEntity, Relationship, RelationshipType, VisibilityType];
     }
 
     protected override computeIsSubtype(subtype: string, supertype: string): boolean {
@@ -100,8 +284,8 @@ export class EntityRelationshipAstReflection extends AbstractAstReflection {
     getReferenceType(refInfo: ReferenceInfo): string {
         const referenceId = `${refInfo.container.$type}:${refInfo.property}`;
         switch (referenceId) {
-            case 'Relationship:source':
-            case 'Relationship:target': {
+            case 'Entity:extends':
+            case 'RelationEntity:entity': {
                 return Entity;
             }
             default: {
@@ -116,7 +300,45 @@ export class EntityRelationshipAstReflection extends AbstractAstReflection {
                 return {
                     name: Attribute,
                     properties: [
-                        { name: 'name' }
+                        { name: 'datatype' },
+                        { name: 'name' },
+                        { name: 'type' },
+                        { name: 'visibility' }
+                    ]
+                };
+            }
+            case AttributeType: {
+                return {
+                    name: AttributeType,
+                    properties: [
+                        { name: 'ATTR_NONE' },
+                        { name: 'DERIVED' },
+                        { name: 'KEY' },
+                        { name: 'MULTIVALUED' },
+                        { name: 'OPTIONAL' },
+                        { name: 'PARTIAL_KEY' }
+                    ]
+                };
+            }
+            case CardinalityType: {
+                return {
+                    name: CardinalityType,
+                    properties: [
+                        { name: 'CARD_NONE' },
+                        { name: 'MANY' },
+                        { name: 'ONE' },
+                        { name: 'ZERO_OR_MORE' },
+                        { name: 'ZERO_OR_ONE' }
+                    ]
+                };
+            }
+            case DataType: {
+                return {
+                    name: DataType,
+                    properties: [
+                        { name: 'd' },
+                        { name: 'size' },
+                        { name: 'type' }
                     ]
                 };
             }
@@ -125,7 +347,9 @@ export class EntityRelationshipAstReflection extends AbstractAstReflection {
                     name: Entity,
                     properties: [
                         { name: 'attributes', defaultValue: [] },
-                        { name: 'name' }
+                        { name: 'extends' },
+                        { name: 'name' },
+                        { name: 'weak', defaultValue: false }
                     ]
                 };
             }
@@ -134,7 +358,39 @@ export class EntityRelationshipAstReflection extends AbstractAstReflection {
                     name: Model,
                     properties: [
                         { name: 'entities', defaultValue: [] },
+                        { name: 'name' },
+                        { name: 'notation' },
                         { name: 'relationships', defaultValue: [] }
+                    ]
+                };
+            }
+            case NotationOption: {
+                return {
+                    name: NotationOption,
+                    properties: [
+                        { name: 'notationType' }
+                    ]
+                };
+            }
+            case NotationType: {
+                return {
+                    name: NotationType,
+                    properties: [
+                        { name: 'BACHMAN' },
+                        { name: 'CHEN' },
+                        { name: 'CROWSFOOT' },
+                        { name: 'NOTA_DEFAULT' },
+                        { name: 'UML' }
+                    ]
+                };
+            }
+            case RelationEntity: {
+                return {
+                    name: RelationEntity,
+                    properties: [
+                        { name: 'cardinality' },
+                        { name: 'entity' },
+                        { name: 'role' }
                     ]
                 };
             }
@@ -142,9 +398,38 @@ export class EntityRelationshipAstReflection extends AbstractAstReflection {
                 return {
                     name: Relationship,
                     properties: [
+                        { name: 'attributes', defaultValue: [] },
                         { name: 'name' },
+                        { name: 'secondaryTargets', defaultValue: [] },
+                        { name: 'secondaryTypes', defaultValue: [] },
                         { name: 'source' },
-                        { name: 'target' }
+                        { name: 'target' },
+                        { name: 'type' },
+                        { name: 'weak', defaultValue: false }
+                    ]
+                };
+            }
+            case RelationshipType: {
+                return {
+                    name: RelationshipType,
+                    properties: [
+                        { name: 'AGGREGATION_LEFT' },
+                        { name: 'AGGREGATION_RIGHT' },
+                        { name: 'COMPOSITION_LEFT' },
+                        { name: 'COMPOSITION_RIGHT' },
+                        { name: 'RELA_DEFAULT' }
+                    ]
+                };
+            }
+            case VisibilityType: {
+                return {
+                    name: VisibilityType,
+                    properties: [
+                        { name: 'PACKAGE' },
+                        { name: 'PRIVATE' },
+                        { name: 'PROTECTED' },
+                        { name: 'PUBLIC' },
+                        { name: 'VISI_NONE' }
                     ]
                 };
             }

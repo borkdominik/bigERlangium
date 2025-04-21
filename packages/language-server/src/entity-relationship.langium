@@ -21,12 +21,12 @@ Relationship:
     '}'; // e.g. relationship Placed {Customer[...]->Order[...]}
 
 RelationEntity:
-    target=[Entity:ID] ('[' 
+    entity=[Entity:ID] ('[' 
         cardinality=CardinalityType ('|' role=STRING)? 
     ']')?; // e.g. Customer[1|Buyer]
 
 Attribute:
-    (visibilty=VisibilityType)? name=ID (':' datatype=DataType)? (type=AttributeType)?; // e.g. +size: float(...) optional
+    (visibility=VisibilityType)? name=ID (':' datatype=DataType)? (type=AttributeType)?; // e.g. +size: float(...) optional
 
 DataType:
     type=ID ('(' size=INT (',' d=INT)? ')')?; // e.g. float(255, 2) | d specifies the number of digits after the decimal point

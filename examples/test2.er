@@ -1,0 +1,9 @@
+erdiagram test
+
+entity Entity4 {
+    attr key
+}
+
+entity Entity3 {
+    attr partial_key
+}
