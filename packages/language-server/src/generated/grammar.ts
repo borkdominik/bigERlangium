@@ -218,7 +218,8 @@ export const EntityRelationshipGrammar = (): Grammar => loadedEntityRelationship
             "terminal": {
               "$type": "Keyword",
               "value": "weak"
-            }
+            },
+            "cardinality": "?"
           },
           {
             "$type": "Keyword",

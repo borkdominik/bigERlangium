@@ -1,4 +1,5 @@
 erdiagram test
+notation=default
 
 entity Entity4 {
     attr key

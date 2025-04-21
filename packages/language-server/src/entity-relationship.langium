@@ -14,7 +14,7 @@ Entity:
     '}'; // e.g. entity Customer extends Person {...}
 
 Relationship:
-    (weak?='weak') 'relationship' name=ID '{'
+    (weak?='weak')? 'relationship' name=ID '{'
         source=RelationEntity type=RelationshipType target=RelationEntity
         (secondaryTypes+=RelationshipType secondaryTargets+=RelationEntity)*
         (attributes+=Attribute)*
