@@ -1,10 +1,23 @@
 erdiagram test
 notation=default
 
-entity Entity4 {
-    attr key
+entity Entity1 {
+    attr:FLOAT(255,3)
 }
 
-entity Entity3 {
+entity Entity2 extends Entity1 {
+
+}
+
+entity Entity4 {
+    attr:INT(255) key
+}
+
+weak entity Entity3 {
     attr partial_key
+}
+
+
+relationship Rel {
+    Entity4[1..1] -> Entity3[1] -o Entity1[1..N] *- Entity2[N]
 }
