@@ -40,3 +40,13 @@ svg {
 .sprotty-palette > div:hover {
     color: var(--vscode-textLink-activeForeground);
 }
+
+.key {
+    font-style: italic;
+    text-decoration: underline;
+}
+.partial-key {
+    font-style: italic;
+    text-decoration: underline;
+    fill: gray;
+}

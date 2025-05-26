@@ -17,36 +17,105 @@ export const EntityRelationshipGrammar = (): Grammar => loadedEntityRelationship
       "entry": true,
       "name": "Model",
       "definition": {
-        "$type": "Alternatives",
+        "$type": "Group",
         "elements": [
           {
+            "$type": "Keyword",
+            "value": "erdiagram"
+          },
+          {
             "$type": "Assignment",
-            "feature": "entities",
-            "operator": "+=",
+            "feature": "name",
+            "operator": "=",
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@1"
+                "$ref": "#/rules@13"
               },
               "arguments": []
             }
           },
           {
             "$type": "Assignment",
-            "feature": "relationships",
-            "operator": "+=",
+            "feature": "notation",
+            "operator": "=",
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@2"
+                "$ref": "#/rules@1"
+              },
+              "arguments": []
+            },
+            "cardinality": "?"
+          },
+          {
+            "$type": "Alternatives",
+            "elements": [
+              {
+                "$type": "Assignment",
+                "feature": "entities",
+                "operator": "+=",
+                "terminal": {
+                  "$type": "RuleCall",
+                  "rule": {
+                    "$ref": "#/rules@2"
+                  },
+                  "arguments": []
+                }
+              },
+              {
+                "$type": "Assignment",
+                "feature": "relationships",
+                "operator": "+=",
+                "terminal": {
+                  "$type": "RuleCall",
+                  "rule": {
+                    "$ref": "#/rules@3"
+                  },
+                  "arguments": []
+                }
+              }
+            ],
+            "cardinality": "*"
+          }
+        ]
+      },
+      "definesHiddenTokens": false,
+      "fragment": false,
+      "hiddenTokens": [],
+      "parameters": [],
+      "wildcard": false
+    },
+    {
+      "$type": "ParserRule",
+      "name": "NotationOption",
+      "definition": {
+        "$type": "Group",
+        "elements": [
+          {
+            "$type": "Keyword",
+            "value": "notation"
+          },
+          {
+            "$type": "Keyword",
+            "value": "="
+          },
+          {
+            "$type": "Assignment",
+            "feature": "notationType",
+            "operator": "=",
+            "terminal": {
+              "$type": "RuleCall",
+              "rule": {
+                "$ref": "#/rules@9"
               },
               "arguments": []
             }
           }
-        ],
-        "cardinality": "*"
+        ]
       },
       "definesHiddenTokens": false,
+      "entry": false,
       "fragment": false,
       "hiddenTokens": [],
       "parameters": [],
@@ -59,6 +128,16 @@ export const EntityRelationshipGrammar = (): Grammar => loadedEntityRelationship
         "$type": "Group",
         "elements": [
           {
+            "$type": "Assignment",
+            "feature": "weak",
+            "operator": "?=",
+            "terminal": {
+              "$type": "Keyword",
+              "value": "weak"
+            },
+            "cardinality": "?"
+          },
+          {
             "$type": "Keyword",
             "value": "entity"
           },
@@ -69,10 +148,32 @@ export const EntityRelationshipGrammar = (): Grammar => loadedEntityRelationship
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@5"
+                "$ref": "#/rules@13"
               },
               "arguments": []
             }
+          },
+          {
+            "$type": "Group",
+            "elements": [
+              {
+                "$type": "Keyword",
+                "value": "extends"
+              },
+              {
+                "$type": "Assignment",
+                "feature": "extends",
+                "operator": "=",
+                "terminal": {
+                  "$type": "CrossReference",
+                  "type": {
+                    "$ref": "#/rules@2"
+                  },
+                  "deprecatedSyntax": false
+                }
+              }
+            ],
+            "cardinality": "?"
           },
           {
             "$type": "Keyword",
@@ -85,10 +186,11 @@ export const EntityRelationshipGrammar = (): Grammar => loadedEntityRelationship
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@3"
+                "$ref": "#/rules@5"
               },
               "arguments": []
-            }
+            },
+            "cardinality": "*"
           },
           {
             "$type": "Keyword",
@@ -110,6 +212,16 @@ export const EntityRelationshipGrammar = (): Grammar => loadedEntityRelationship
         "$type": "Group",
         "elements": [
           {
+            "$type": "Assignment",
+            "feature": "weak",
+            "operator": "?=",
+            "terminal": {
+              "$type": "Keyword",
+              "value": "weak"
+            },
+            "cardinality": "?"
+          },
+          {
             "$type": "Keyword",
             "value": "relationship"
           },
@@ -120,7 +232,7 @@ export const EntityRelationshipGrammar = (): Grammar => loadedEntityRelationship
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@5"
+                "$ref": "#/rules@13"
               },
               "arguments": []
             }
@@ -134,42 +246,79 @@ export const EntityRelationshipGrammar = (): Grammar => loadedEntityRelationship
             "feature": "source",
             "operator": "=",
             "terminal": {
-              "$type": "CrossReference",
-              "type": {
-                "$ref": "#/rules@1"
+              "$type": "RuleCall",
+              "rule": {
+                "$ref": "#/rules@4"
               },
-              "terminal": {
-                "$type": "RuleCall",
-                "rule": {
-                  "$ref": "#/rules@5"
-                },
-                "arguments": []
-              },
-              "deprecatedSyntax": false
+              "arguments": []
             }
           },
           {
-            "$type": "Keyword",
-            "value": "->"
+            "$type": "Assignment",
+            "feature": "type",
+            "operator": "=",
+            "terminal": {
+              "$type": "RuleCall",
+              "rule": {
+                "$ref": "#/rules@10"
+              },
+              "arguments": []
+            }
           },
           {
             "$type": "Assignment",
             "feature": "target",
             "operator": "=",
             "terminal": {
-              "$type": "CrossReference",
-              "type": {
-                "$ref": "#/rules@1"
+              "$type": "RuleCall",
+              "rule": {
+                "$ref": "#/rules@4"
               },
-              "terminal": {
-                "$type": "RuleCall",
-                "rule": {
-                  "$ref": "#/rules@5"
-                },
-                "arguments": []
-              },
-              "deprecatedSyntax": false
+              "arguments": []
             }
+          },
+          {
+            "$type": "Group",
+            "elements": [
+              {
+                "$type": "Assignment",
+                "feature": "secondaryTypes",
+                "operator": "+=",
+                "terminal": {
+                  "$type": "RuleCall",
+                  "rule": {
+                    "$ref": "#/rules@10"
+                  },
+                  "arguments": []
+                }
+              },
+              {
+                "$type": "Assignment",
+                "feature": "secondaryTargets",
+                "operator": "+=",
+                "terminal": {
+                  "$type": "RuleCall",
+                  "rule": {
+                    "$ref": "#/rules@4"
+                  },
+                  "arguments": []
+                }
+              }
+            ],
+            "cardinality": "*"
+          },
+          {
+            "$type": "Assignment",
+            "feature": "attributes",
+            "operator": "+=",
+            "terminal": {
+              "$type": "RuleCall",
+              "rule": {
+                "$ref": "#/rules@5"
+              },
+              "arguments": []
+            },
+            "cardinality": "*"
           },
           {
             "$type": "Keyword",
@@ -186,18 +335,591 @@ export const EntityRelationshipGrammar = (): Grammar => loadedEntityRelationship
     },
     {
       "$type": "ParserRule",
+      "name": "RelationEntity",
+      "definition": {
+        "$type": "Group",
+        "elements": [
+          {
+            "$type": "Assignment",
+            "feature": "entity",
+            "operator": "=",
+            "terminal": {
+              "$type": "CrossReference",
+              "type": {
+                "$ref": "#/rules@2"
+              },
+              "terminal": {
+                "$type": "RuleCall",
+                "rule": {
+                  "$ref": "#/rules@13"
+                },
+                "arguments": []
+              },
+              "deprecatedSyntax": false
+            }
+          },
+          {
+            "$type": "Group",
+            "elements": [
+              {
+                "$type": "Keyword",
+                "value": "["
+              },
+              {
+                "$type": "Assignment",
+                "feature": "cardinality",
+                "operator": "=",
+                "terminal": {
+                  "$type": "RuleCall",
+                  "rule": {
+                    "$ref": "#/rules@8"
+                  },
+                  "arguments": []
+                }
+              },
+              {
+                "$type": "Group",
+                "elements": [
+                  {
+                    "$type": "Keyword",
+                    "value": "|"
+                  },
+                  {
+                    "$type": "Assignment",
+                    "feature": "role",
+                    "operator": "=",
+                    "terminal": {
+                      "$type": "RuleCall",
+                      "rule": {
+                        "$ref": "#/rules@15"
+                      },
+                      "arguments": []
+                    }
+                  }
+                ],
+                "cardinality": "?"
+              },
+              {
+                "$type": "Keyword",
+                "value": "]"
+              }
+            ],
+            "cardinality": "?"
+          }
+        ]
+      },
+      "definesHiddenTokens": false,
+      "entry": false,
+      "fragment": false,
+      "hiddenTokens": [],
+      "parameters": [],
+      "wildcard": false
+    },
+    {
+      "$type": "ParserRule",
       "name": "Attribute",
       "definition": {
-        "$type": "Assignment",
-        "feature": "name",
-        "operator": "=",
-        "terminal": {
-          "$type": "RuleCall",
-          "rule": {
-            "$ref": "#/rules@5"
+        "$type": "Group",
+        "elements": [
+          {
+            "$type": "Assignment",
+            "feature": "visibility",
+            "operator": "=",
+            "terminal": {
+              "$type": "RuleCall",
+              "rule": {
+                "$ref": "#/rules@11"
+              },
+              "arguments": []
+            },
+            "cardinality": "?"
           },
-          "arguments": []
-        }
+          {
+            "$type": "Assignment",
+            "feature": "name",
+            "operator": "=",
+            "terminal": {
+              "$type": "RuleCall",
+              "rule": {
+                "$ref": "#/rules@13"
+              },
+              "arguments": []
+            }
+          },
+          {
+            "$type": "Group",
+            "elements": [
+              {
+                "$type": "Keyword",
+                "value": ":"
+              },
+              {
+                "$type": "Assignment",
+                "feature": "datatype",
+                "operator": "=",
+                "terminal": {
+                  "$type": "RuleCall",
+                  "rule": {
+                    "$ref": "#/rules@6"
+                  },
+                  "arguments": []
+                }
+              }
+            ],
+            "cardinality": "?"
+          },
+          {
+            "$type": "Assignment",
+            "feature": "type",
+            "operator": "=",
+            "terminal": {
+              "$type": "RuleCall",
+              "rule": {
+                "$ref": "#/rules@7"
+              },
+              "arguments": []
+            },
+            "cardinality": "?"
+          }
+        ]
+      },
+      "definesHiddenTokens": false,
+      "entry": false,
+      "fragment": false,
+      "hiddenTokens": [],
+      "parameters": [],
+      "wildcard": false
+    },
+    {
+      "$type": "ParserRule",
+      "name": "DataType",
+      "definition": {
+        "$type": "Group",
+        "elements": [
+          {
+            "$type": "Assignment",
+            "feature": "type",
+            "operator": "=",
+            "terminal": {
+              "$type": "RuleCall",
+              "rule": {
+                "$ref": "#/rules@13"
+              },
+              "arguments": []
+            }
+          },
+          {
+            "$type": "Group",
+            "elements": [
+              {
+                "$type": "Keyword",
+                "value": "("
+              },
+              {
+                "$type": "Assignment",
+                "feature": "size",
+                "operator": "=",
+                "terminal": {
+                  "$type": "RuleCall",
+                  "rule": {
+                    "$ref": "#/rules@14"
+                  },
+                  "arguments": []
+                }
+              },
+              {
+                "$type": "Group",
+                "elements": [
+                  {
+                    "$type": "Keyword",
+                    "value": ","
+                  },
+                  {
+                    "$type": "Assignment",
+                    "feature": "d",
+                    "operator": "=",
+                    "terminal": {
+                      "$type": "RuleCall",
+                      "rule": {
+                        "$ref": "#/rules@14"
+                      },
+                      "arguments": []
+                    }
+                  }
+                ],
+                "cardinality": "?"
+              },
+              {
+                "$type": "Keyword",
+                "value": ")"
+              }
+            ],
+            "cardinality": "?"
+          }
+        ]
+      },
+      "definesHiddenTokens": false,
+      "entry": false,
+      "fragment": false,
+      "hiddenTokens": [],
+      "parameters": [],
+      "wildcard": false
+    },
+    {
+      "$type": "ParserRule",
+      "name": "AttributeType",
+      "definition": {
+        "$type": "Alternatives",
+        "elements": [
+          {
+            "$type": "Assignment",
+            "feature": "ATTR_NONE",
+            "operator": "=",
+            "terminal": {
+              "$type": "Keyword",
+              "value": "none"
+            }
+          },
+          {
+            "$type": "Assignment",
+            "feature": "KEY",
+            "operator": "=",
+            "terminal": {
+              "$type": "Keyword",
+              "value": "key"
+            }
+          },
+          {
+            "$type": "Assignment",
+            "feature": "PARTIAL_KEY",
+            "operator": "=",
+            "terminal": {
+              "$type": "Keyword",
+              "value": "partial_key"
+            }
+          },
+          {
+            "$type": "Assignment",
+            "feature": "OPTIONAL",
+            "operator": "=",
+            "terminal": {
+              "$type": "Keyword",
+              "value": "optional"
+            }
+          },
+          {
+            "$type": "Assignment",
+            "feature": "DERIVED",
+            "operator": "=",
+            "terminal": {
+              "$type": "Keyword",
+              "value": "derived"
+            }
+          },
+          {
+            "$type": "Assignment",
+            "feature": "MULTIVALUED",
+            "operator": "=",
+            "terminal": {
+              "$type": "Keyword",
+              "value": "multivalued"
+            }
+          }
+        ]
+      },
+      "definesHiddenTokens": false,
+      "entry": false,
+      "fragment": false,
+      "hiddenTokens": [],
+      "parameters": [],
+      "wildcard": false
+    },
+    {
+      "$type": "ParserRule",
+      "name": "CardinalityType",
+      "definition": {
+        "$type": "Alternatives",
+        "elements": [
+          {
+            "$type": "Assignment",
+            "feature": "CARD_NONE",
+            "operator": "=",
+            "terminal": {
+              "$type": "Keyword",
+              "value": "none"
+            }
+          },
+          {
+            "$type": "Assignment",
+            "feature": "ZERO_OR_ONE",
+            "operator": "=",
+            "terminal": {
+              "$type": "Keyword",
+              "value": "0..1"
+            }
+          },
+          {
+            "$type": "Assignment",
+            "feature": "ZERO_OR_MORE",
+            "operator": "=",
+            "terminal": {
+              "$type": "Keyword",
+              "value": "0..N"
+            }
+          },
+          {
+            "$type": "Assignment",
+            "feature": "ONE",
+            "operator": "=",
+            "terminal": {
+              "$type": "Keyword",
+              "value": "1"
+            }
+          },
+          {
+            "$type": "Assignment",
+            "feature": "ONE",
+            "operator": "=",
+            "terminal": {
+              "$type": "Keyword",
+              "value": "1..1"
+            }
+          },
+          {
+            "$type": "Assignment",
+            "feature": "MANY",
+            "operator": "=",
+            "terminal": {
+              "$type": "Keyword",
+              "value": "N"
+            }
+          },
+          {
+            "$type": "Assignment",
+            "feature": "MANY",
+            "operator": "=",
+            "terminal": {
+              "$type": "Keyword",
+              "value": "1..N"
+            }
+          }
+        ]
+      },
+      "definesHiddenTokens": false,
+      "entry": false,
+      "fragment": false,
+      "hiddenTokens": [],
+      "parameters": [],
+      "wildcard": false
+    },
+    {
+      "$type": "ParserRule",
+      "name": "NotationType",
+      "definition": {
+        "$type": "Alternatives",
+        "elements": [
+          {
+            "$type": "Assignment",
+            "feature": "NOTA_DEFAULT",
+            "operator": "=",
+            "terminal": {
+              "$type": "Keyword",
+              "value": "default"
+            }
+          },
+          {
+            "$type": "Assignment",
+            "feature": "CHEN",
+            "operator": "=",
+            "terminal": {
+              "$type": "Keyword",
+              "value": "chen"
+            }
+          },
+          {
+            "$type": "Assignment",
+            "feature": "BACHMAN",
+            "operator": "=",
+            "terminal": {
+              "$type": "Keyword",
+              "value": "bachman"
+            }
+          },
+          {
+            "$type": "Assignment",
+            "feature": "CROWSFOOT",
+            "operator": "=",
+            "terminal": {
+              "$type": "Keyword",
+              "value": "crowfoot"
+            }
+          },
+          {
+            "$type": "Assignment",
+            "feature": "UML",
+            "operator": "=",
+            "terminal": {
+              "$type": "Keyword",
+              "value": "uml"
+            }
+          }
+        ]
+      },
+      "definesHiddenTokens": false,
+      "entry": false,
+      "fragment": false,
+      "hiddenTokens": [],
+      "parameters": [],
+      "wildcard": false
+    },
+    {
+      "$type": "ParserRule",
+      "name": "RelationshipType",
+      "definition": {
+        "$type": "Alternatives",
+        "elements": [
+          {
+            "$type": "Assignment",
+            "feature": "RELA_DEFAULT",
+            "operator": "=",
+            "terminal": {
+              "$type": "Keyword",
+              "value": "->"
+            }
+          },
+          {
+            "$type": "Assignment",
+            "feature": "AGGREGATION_LEFT",
+            "operator": "=",
+            "terminal": {
+              "$type": "Keyword",
+              "value": "o-"
+            }
+          },
+          {
+            "$type": "Assignment",
+            "feature": "AGGREGATION_RIGHT",
+            "operator": "=",
+            "terminal": {
+              "$type": "Keyword",
+              "value": "-o"
+            }
+          },
+          {
+            "$type": "Assignment",
+            "feature": "COMPOSITION_LEFT",
+            "operator": "=",
+            "terminal": {
+              "$type": "Keyword",
+              "value": "*-"
+            }
+          },
+          {
+            "$type": "Assignment",
+            "feature": "COMPOSITION_RIGHT",
+            "operator": "=",
+            "terminal": {
+              "$type": "Keyword",
+              "value": "-*"
+            }
+          }
+        ]
+      },
+      "definesHiddenTokens": false,
+      "entry": false,
+      "fragment": false,
+      "hiddenTokens": [],
+      "parameters": [],
+      "wildcard": false
+    },
+    {
+      "$type": "ParserRule",
+      "name": "VisibilityType",
+      "definition": {
+        "$type": "Alternatives",
+        "elements": [
+          {
+            "$type": "Assignment",
+            "feature": "VISI_NONE",
+            "operator": "=",
+            "terminal": {
+              "$type": "Keyword",
+              "value": "none"
+            }
+          },
+          {
+            "$type": "Assignment",
+            "feature": "PUBLIC",
+            "operator": "=",
+            "terminal": {
+              "$type": "Keyword",
+              "value": "public"
+            }
+          },
+          {
+            "$type": "Assignment",
+            "feature": "PUBLIC",
+            "operator": "=",
+            "terminal": {
+              "$type": "Keyword",
+              "value": "+"
+            }
+          },
+          {
+            "$type": "Assignment",
+            "feature": "PROTECTED",
+            "operator": "=",
+            "terminal": {
+              "$type": "Keyword",
+              "value": "protected"
+            }
+          },
+          {
+            "$type": "Assignment",
+            "feature": "PROTECTED",
+            "operator": "=",
+            "terminal": {
+              "$type": "Keyword",
+              "value": "#"
+            }
+          },
+          {
+            "$type": "Assignment",
+            "feature": "PRIVATE",
+            "operator": "=",
+            "terminal": {
+              "$type": "Keyword",
+              "value": "private"
+            }
+          },
+          {
+            "$type": "Assignment",
+            "feature": "PRIVATE",
+            "operator": "=",
+            "terminal": {
+              "$type": "Keyword",
+              "value": "-"
+            }
+          },
+          {
+            "$type": "Assignment",
+            "feature": "PACKAGE",
+            "operator": "=",
+            "terminal": {
+              "$type": "Keyword",
+              "value": "package"
+            }
+          },
+          {
+            "$type": "Assignment",
+            "feature": "PACKAGE",
+            "operator": "=",
+            "terminal": {
+              "$type": "Keyword",
+              "value": "~"
+            }
+          }
+        ]
       },
       "definesHiddenTokens": false,
       "entry": false,

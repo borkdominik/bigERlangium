@@ -7,7 +7,9 @@ import {
     PreRenderedElementImpl, PreRenderedView, SGraphView, SLabelView, SRoutingHandleImpl, SRoutingHandleView, 
     TYPES, loadDefaultModules, SGraphImpl, SLabelImpl, labelEditUiModule, RectangularNodeView, 
     PolylineEdgeView, RectangularNode,
-    editLabelFeature
+    editLabelFeature,
+    SCompartmentImpl,
+    SCompartmentView
 } from 'sprotty';
 import {
     LibavoidDiamondAnchor,
@@ -38,6 +40,15 @@ const ERDiagramModule = new ContainerModule((bind, unbind, isBound, rebind) => {
     configureModelElement(context, 'graph', SGraphImpl, SGraphView);
     configureModelElement(context, 'node', RectangularNode, RectangularNodeView);
     configureModelElement(context, 'label:name', SLabelImpl, SLabelView, { enable: [editLabelFeature]});
+    //
+    configureModelElement(context, 'compartment:attributes', SCompartmentImpl, SCompartmentView);
+    configureModelElement(context, 'compartment:attribute-row', SCompartmentImpl, SCompartmentView);
+    configureModelElement(context, 'label:attributes', SLabelImpl, SLabelView, { enable: [editLabelFeature]});
+    configureModelElement(context, 'label:text', SLabelImpl, SLabelView, { enable: [editLabelFeature] });
+    configureModelElement(context, 'label:key', SLabelImpl, SLabelView, { enable: [editLabelFeature] });
+    configureModelElement(context, 'label:partial-key', SLabelImpl, SLabelView, { enable: [editLabelFeature] });
+
+    //
     configureModelElement(context, 'edge', RelationshipEdge, PolylineEdgeView);
     configureModelElement(context, 'html', HtmlRootImpl, HtmlRootView);
     configureModelElement(context, 'pre-rendered', PreRenderedElementImpl, PreRenderedView);
