@@ -1,7 +1,6 @@
 import type { ValidationAcceptor, ValidationChecks } from 'langium';
 import type { Entity, EntityRelationshipAstType, Model, Relationship, RelationEntity, Attribute } from './generated/ast.js';
 import type { EntityRelationshipServices } from './entity-relationship-module.js';
-import { startsWithUppercaseLetter } from './validation-helper.js'
 import { isModel } from './generated/ast.js';
 
 /**
@@ -13,8 +12,9 @@ export function registerValidationChecks(services: EntityRelationshipServices) {
     const checks: ValidationChecks<EntityRelationshipAstType> = {
         Model: [validator.checkModelName, validator.checkModelEntityNamesForDuplicates, validator.checkModelRelationshipNamesForDuplicates],
         Entity: [validator.checkEntityOrRelationshipAttributes, validator.checkEntityStartsWithCapitalLetter,],
-        Relationship: [validator.checkEntityOrRelationshipAttributes],
-        RelationEntity: [validator.checkRelationEntityCardinality]
+        Relationship: [validator.checkEntityOrRelationshipAttributes, validator.checkRelationshipAggregationCompositionForNotations],
+        RelationEntity: [validator.checkRelationEntityCardinalityForNotations],
+        Attribute: [validator.checkAttributeVisibilityForUMLNotation]
     };
     registry.register(checks, validator);
 }
@@ -26,7 +26,7 @@ export class EntityRelationshipValidator {
     /*
     *   MODEL
     */
-   // Check if the model has a name
+    // Check if the model has a name
     checkModelName(model: Model, accept: ValidationAcceptor): void {
         if (!model.name || model.name.trim() === "") {
             accept("error", "Missing model header 'erdiagram <name>'", { node: model, range: { start: { line: 0, character: 0 }, end: { line: 1, character: 0 } } });
@@ -61,7 +61,7 @@ export class EntityRelationshipValidator {
     // Performs a check on an entity name to check for the capitalization of the first letter of its name
     checkEntityStartsWithCapitalLetter(entity: Entity, accept: ValidationAcceptor): void {
         if (entity.name) {
-            if (!startsWithUppercaseLetter(entity.name)) {
+            if (!/[A-Z]/.test(entity.name[0])) {
                 accept('warning', 'Entity name should start with a capital letter.', { node: entity, property: 'name' })
             }
         }
@@ -122,16 +122,31 @@ export class EntityRelationshipValidator {
     /*
     *   RELATIONSHIP
     */
-    checkRelationshipAggregationComposition(relationship: Relationship, accept: ValidationAcceptor){
+    // Check if an incorrect version of Composition/Aggregation is used depending on the chosen diagram type.
+    checkRelationshipAggregationCompositionForNotations(relationship: Relationship, accept: ValidationAcceptor){
         let model = relationship.$container;
         if (isModel(model)) {
             let notation = model.notation?.notationType;
             if (notation !== null){
                 if(notation?.UML != undefined){
-                    //TODO
+                    if(relationship.targets.length > 1)
+                    relationship.targets.forEach(target => {
+                        if(target.type.RELA_DEFAULT == undefined){
+                            accept('warning', `Aggregation/Composition only supported for binary relationships `, { node: target, property: "type"});
+                        }
+                    });
                 }
                 else{
-
+                    relationship.targets.forEach(target => {
+                        if(target.type.AGGREGATION_LEFT != undefined || target.type.AGGREGATION_RIGHT != undefined){
+                            accept('warning', `Aggregation is only supported in UML`, { node: target, property: "type"});
+                        }
+                    });
+                    relationship.targets.forEach(target => {
+                        if(target.type.COMPOSITION_LEFT != undefined || target.type.COMPOSITION_RIGHT != undefined){
+                            accept('warning', `Composition is only supported in UML`, { node: target, property: "type"});
+                        }
+                    });
                 }
             }
         }
@@ -141,7 +156,7 @@ export class EntityRelationshipValidator {
     *   RELATION ENTITY
     */
     // checks the cardinality of a relationship entity when the notation is set to bachman, chen or crowsfoot to discourage incorrect use of cardinalities
-    checkRelationEntityCardinality(relation: RelationEntity, accept: ValidationAcceptor) {
+    checkRelationEntityCardinalityForNotations(relation: RelationEntity, accept: ValidationAcceptor) {
         let model = relation.$container.$container;
         if (isModel(model)) {
             let notation = model.notation?.notationType
@@ -161,8 +176,15 @@ export class EntityRelationshipValidator {
     /*
     *   ATTRIBUTE
     */
-    checkAttributeVisibility(attribute: Attribute, accept: ValidationAcceptor){
-
+    // checks if visibility modifiers are used outside of uml notation
+    checkAttributeVisibilityForUMLNotation(attribute: Attribute, accept: ValidationAcceptor){
+        let model = attribute.$container.$container;
+        if(isModel(model)){
+            let notation = model.notation?.notationType;
+            if(notation && notation.UML == undefined && attribute.visibility != undefined){
+                accept('warning', `Visibility modifiers are only supported by UML`, {node: attribute, property: "visibility"});
+            }
+        }
     }
 
     /*
