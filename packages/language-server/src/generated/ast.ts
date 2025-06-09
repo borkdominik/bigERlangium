@@ -187,7 +187,7 @@ export function isNotationType(item: unknown): item is NotationType {
 }
 
 export interface RelationEntity extends langium.AstNode {
-    readonly $container: Relationship;
+    readonly $container: RelationTarget | Relationship;
     readonly $type: 'RelationEntity';
     cardinality?: CardinalityType;
     entity: langium.Reference<Entity>;
@@ -205,11 +205,8 @@ export interface Relationship extends langium.AstNode {
     readonly $type: 'Relationship';
     attributes: Array<Attribute>;
     name: string;
-    secondaryTargets: Array<RelationEntity>;
-    secondaryTypes: Array<RelationshipType>;
     source: RelationEntity;
-    target: RelationEntity;
-    type: RelationshipType;
+    targets: Array<RelationTarget>;
     weak: boolean;
 }
 
@@ -220,7 +217,7 @@ export function isRelationship(item: unknown): item is Relationship {
 }
 
 export interface RelationshipType extends langium.AstNode {
-    readonly $container: Relationship;
+    readonly $container: RelationTarget;
     readonly $type: 'RelationshipType';
     AGGREGATION_LEFT?: 'o-';
     AGGREGATION_RIGHT?: '-o';
@@ -233,6 +230,19 @@ export const RelationshipType = 'RelationshipType';
 
 export function isRelationshipType(item: unknown): item is RelationshipType {
     return reflection.isInstance(item, RelationshipType);
+}
+
+export interface RelationTarget extends langium.AstNode {
+    readonly $container: Relationship;
+    readonly $type: 'RelationTarget';
+    relationEntity: RelationEntity;
+    type: RelationshipType;
+}
+
+export const RelationTarget = 'RelationTarget';
+
+export function isRelationTarget(item: unknown): item is RelationTarget {
+    return reflection.isInstance(item, RelationTarget);
 }
 
 export interface VisibilityType extends langium.AstNode {
@@ -261,6 +271,7 @@ export type EntityRelationshipAstType = {
     NotationOption: NotationOption
     NotationType: NotationType
     RelationEntity: RelationEntity
+    RelationTarget: RelationTarget
     Relationship: Relationship
     RelationshipType: RelationshipType
     VisibilityType: VisibilityType
@@ -269,7 +280,7 @@ export type EntityRelationshipAstType = {
 export class EntityRelationshipAstReflection extends langium.AbstractAstReflection {
 
     getAllTypes(): string[] {
-        return [Attribute, AttributeType, CardinalityType, DataType, Entity, Model, NotationOption, NotationType, RelationEntity, Relationship, RelationshipType, VisibilityType];
+        return [Attribute, AttributeType, CardinalityType, DataType, Entity, Model, NotationOption, NotationType, RelationEntity, RelationTarget, Relationship, RelationshipType, VisibilityType];
     }
 
     protected override computeIsSubtype(subtype: string, supertype: string): boolean {
@@ -399,11 +410,8 @@ export class EntityRelationshipAstReflection extends langium.AbstractAstReflecti
                     properties: [
                         { name: 'attributes', defaultValue: [] },
                         { name: 'name' },
-                        { name: 'secondaryTargets', defaultValue: [] },
-                        { name: 'secondaryTypes', defaultValue: [] },
                         { name: 'source' },
-                        { name: 'target' },
-                        { name: 'type' },
+                        { name: 'targets', defaultValue: [] },
                         { name: 'weak', defaultValue: false }
                     ]
                 };
@@ -417,6 +425,15 @@ export class EntityRelationshipAstReflection extends langium.AbstractAstReflecti
                         { name: 'COMPOSITION_LEFT' },
                         { name: 'COMPOSITION_RIGHT' },
                         { name: 'RELA_DEFAULT' }
+                    ]
+                };
+            }
+            case RelationTarget: {
+                return {
+                    name: RelationTarget,
+                    properties: [
+                        { name: 'relationEntity' },
+                        { name: 'type' }
                     ]
                 };
             }
