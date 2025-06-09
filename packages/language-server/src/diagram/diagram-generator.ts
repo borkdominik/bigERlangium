@@ -76,7 +76,7 @@ export class ERDiagramGenerator extends LangiumDiagramGenerator {
     protected generateEdge(relationship: Relationship, ctx: GeneratorContext<Model>): SEdge {
         const { idCache } = ctx;
         const sourceId = idCache.getId(relationship.source.entity.ref);
-        const targetId = idCache.getId(relationship.target.entity.ref);
+        const targetId = idCache.getId(relationship.targets[0].relationEntity.entity.ref);
         const edgeId = idCache.uniqueId(`${sourceId}:${relationship.name}:${targetId}`, relationship);
         
         const edge: SEdge = {
