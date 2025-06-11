@@ -15,10 +15,12 @@ Entity:
 
 Relationship:
     (weak?='weak')? 'relationship' name=ID '{'
-        source=RelationEntity type=RelationshipType target=RelationEntity
-        (secondaryTypes+=RelationshipType secondaryTargets+=RelationEntity)*
+        source=RelationEntity (targets+=RelationTarget)+
         (attributes+=Attribute)*
     '}'; // e.g. relationship Placed {Customer[...]->Order[...]}
+
+RelationTarget:
+    type=RelationshipType relationEntity=RelationEntity;
 
 RelationEntity:
     entity=[Entity:ID] ('[' 
