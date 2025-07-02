@@ -10,6 +10,7 @@
         "reflect-metadata": "^0.2.2",
         "langium": "^3.4.0",
         "langium-sprotty": "^3.4.0",
+        "sprotty": "^1.4.0",
         "sprotty-elk": "^1.4.0",
         "vscode-languageserver": "^9.0.1"
     },

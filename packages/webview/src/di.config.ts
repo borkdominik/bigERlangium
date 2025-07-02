@@ -6,7 +6,7 @@ import {
     configureModelElement, ConsoleLogger, HtmlRootImpl, HtmlRootView, LogLevel, overrideViewerOptions, 
     PreRenderedElementImpl, PreRenderedView, SGraphView, SLabelView, SRoutingHandleImpl, SRoutingHandleView, 
     TYPES, loadDefaultModules, SGraphImpl, SLabelImpl, labelEditUiModule, RectangularNodeView, 
-    PolylineEdgeView, RectangularNode,
+    RectangularNode,
     editLabelFeature,
     SCompartmentImpl,
     SCompartmentView
@@ -18,7 +18,8 @@ import {
     LibavoidRouter,
     RouteType,
 } from 'sprotty-routing-libavoid';
-import { RelationshipEdge } from './model';
+import { RelationshipNode } from './model';
+import { RelationshipNodeView } from './views';
 
 /**
  * Sprotty Dependency Injection (DI) container for configuring the diagram
@@ -39,17 +40,19 @@ const ERDiagramModule = new ContainerModule((bind, unbind, isBound, rebind) => {
 
     configureModelElement(context, 'graph', SGraphImpl, SGraphView);
     configureModelElement(context, 'node', RectangularNode, RectangularNodeView);
+    configureModelElement(context, 'node:relationship', RelationshipNode, RelationshipNodeView);
     configureModelElement(context, 'label:name', SLabelImpl, SLabelView, { enable: [editLabelFeature]});
     //
     configureModelElement(context, 'compartment:attributes', SCompartmentImpl, SCompartmentView);
     configureModelElement(context, 'compartment:attribute-row', SCompartmentImpl, SCompartmentView);
+    configureModelElement(context, 'label:relationship', SLabelImpl, SLabelView, { enable: [editLabelFeature] });
     configureModelElement(context, 'label:attributes', SLabelImpl, SLabelView, { enable: [editLabelFeature]});
     configureModelElement(context, 'label:text', SLabelImpl, SLabelView, { enable: [editLabelFeature] });
     configureModelElement(context, 'label:key', SLabelImpl, SLabelView, { enable: [editLabelFeature] });
     configureModelElement(context, 'label:partial-key', SLabelImpl, SLabelView, { enable: [editLabelFeature] });
 
     //
-    configureModelElement(context, 'edge', RelationshipEdge, PolylineEdgeView);
+    //configureModelElement(context, 'edge', RelationshipEdge, PolylineEdgeView);
     configureModelElement(context, 'html', HtmlRootImpl, HtmlRootView);
     configureModelElement(context, 'pre-rendered', PreRenderedElementImpl, PreRenderedView);
     configureModelElement(context, 'routing-point', SRoutingHandleImpl, SRoutingHandleView);
