@@ -20,6 +20,7 @@ import {
 } from 'sprotty-routing-libavoid';
 import { RelationshipNode } from './model';
 import { RelationshipNodeView } from './views';
+import { GRAPH_TYPE } from '@biger/common';
 
 /**
  * Sprotty Dependency Injection (DI) container for configuring the diagram
@@ -38,7 +39,7 @@ const ERDiagramModule = new ContainerModule((bind, unbind, isBound, rebind) => {
     bind(TYPES.IAnchorComputer).to(LibavoidEllipseAnchor).inSingletonScope();
     bind(TYPES.IAnchorComputer).to(LibavoidRectangleAnchor).inSingletonScope();
 
-    configureModelElement(context, 'graph', SGraphImpl, SGraphView);
+    configureModelElement(context, GRAPH_TYPE, SGraphImpl, SGraphView);
     configureModelElement(context, 'node', RectangularNode, RectangularNodeView);
     configureModelElement(context, 'node:relationship', RelationshipNode, RelationshipNodeView);
     configureModelElement(context, 'label:name', SLabelImpl, SLabelView, { enable: [editLabelFeature]});

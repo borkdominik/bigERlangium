@@ -2,6 +2,7 @@ import { GeneratorContext, LangiumDiagramGenerator } from "langium-sprotty";
 import { SModelRoot, SNode, SLabel, SEdge, SCompartment } from "sprotty-protocol";
 import { Attribute, Entity, Model, Relationship } from "../generated/ast.js";
 //import { NotationEdge } from "./model-elements.js";
+import { GRAPH_TYPE } from '@biger/common';
 
 /**
  * Generates a seralizable SModel representation of language elements
@@ -18,7 +19,7 @@ export class ERDiagramGenerator extends LangiumDiagramGenerator {
         //const relationshipEdges = model.relationships.map(r => this.generateEdge(r, args))
         
         const graph = {
-            type: 'graph',
+            type: GRAPH_TYPE,
             id: 'root',
             children: [
                 ...entityNodes,

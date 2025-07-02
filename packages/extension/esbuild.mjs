@@ -30,7 +30,7 @@ const copyLibavoidPlugin = ({
     setup(build) {
         build.onEnd(async () => {
             try {
-                fs.cpSync('../webview/node_modules/libavoid-js/dist/libavoid.wasm', './pack/diagram/libavoid.wasm');
+                fs.cpSync('../../node_modules/libavoid-js/dist/libavoid.wasm', './pack/diagram/libavoid.wasm');
             } catch (e) {
                 console.error('Failed to copy file:', e);
             }
@@ -41,7 +41,8 @@ const copyLibavoidPlugin = ({
 const nodeContext = await esbuild.context({
     entryPoints: [
         'src/main.ts',
-        '../language-server/src/main.ts'
+        '../language-server/src/main.ts',
+        '../common/src/index.ts'
     ],
     outdir: 'pack',
     bundle: true,
