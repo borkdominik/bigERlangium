@@ -1,6 +1,8 @@
 import { GeneratorContext, LangiumDiagramGenerator } from "langium-sprotty";
 import { SModelRoot, SNode, SLabel, SEdge, SCompartment } from "sprotty-protocol";
-import { Attribute, Entity, Model, Relationship } from "../generated/ast.js";
+import { Attribute, Entity, Model, NotationType, RelationEntity, Relationship } from "../generated/ast.js";
+import { NotationEdge } from "./model-elements.js";
+import { RelationshipType } from "../utils/relationship-types.js" ;
 //import { NotationEdge } from "./model-elements.js";
 
 /**
@@ -82,7 +84,7 @@ export class ERDiagramGenerator extends LangiumDiagramGenerator {
      * @param args {@link GeneratorContext} containing the langium document and idCache.
      * @returns an array of up to 3 {@link SEdge}s representing each connection in the relationship
      */
-    /*
+    
     protected generateRelationEdges(relationship: Relationship, ctx: GeneratorContext<Model>): SEdge[] {
         const { idCache } = ctx;
         const { document } = ctx;
@@ -111,11 +113,13 @@ export class ERDiagramGenerator extends LangiumDiagramGenerator {
             if (relationshipType.AGGREGATION_RIGHT || relationshipType.COMPOSITION_RIGHT) {
                 type = relationshipType.toString() as RelationshipType;
             } else if (secondRelationshipType.AGGREGATION_LEFT) {
+                //relationshipType.AGGREGATION_RIGHT = RelationshipType.AGGREGATION_RIGHT;
                 type = RelationshipType.AGGREGATION_RIGHT;
             } else if (secondRelationshipType.COMPOSITION_LEFT) {
+                //relationshipType.COMPOSITION_LEFT = RelationshipType.COMPOSITION_LEFT;
                 type = RelationshipType.COMPOSITION_RIGHT;
             }
-            const targetEdge = this.createEdge(relationship.target!, null, relationshipNodeId!, targetId, type, ctx);
+            const targetEdge = this.createEdge(relationship.target!, null, relationshipNodeId!, targetId, relationshipType.toString(), ctx);
             edges.push(targetEdge);
         }
 
@@ -131,7 +135,7 @@ export class ERDiagramGenerator extends LangiumDiagramGenerator {
         
         return edges;
     }
-        */
+        
 
     /**
      * Creates an edge based on the given parameters
@@ -143,7 +147,7 @@ export class ERDiagramGenerator extends LangiumDiagramGenerator {
      * @param ctx {@link GeneratorContext} containing the langium document and idCache.
      * @returns a {@link NotationEdge} containing all relevant information for rendering.
      */
-    /*
+    
     protected createEdge(target: RelationEntity, source: RelationEntity | null, sourceId: string, targetId: string, relationshipType: string, ctx: GeneratorContext<Model>): SEdge {
         let { idCache } = ctx;
         let { document } = ctx;
@@ -155,7 +159,7 @@ export class ERDiagramGenerator extends LangiumDiagramGenerator {
         const type = this.getEdgeType(target, notationType);
 
         let labels = this.createEdgeLabels(target, source, notationType, edgeId, ctx);
-        const edge = <NotationEdge>{ //TODO: replace SEdge with NotationEdge when available
+        const edge = <SEdge>{ //TODO: replace SEdge with NotationEdge when available
             type: type,
             id: edgeId,
             sourceId: sourceId,
@@ -171,7 +175,56 @@ export class ERDiagramGenerator extends LangiumDiagramGenerator {
 
 
     }
+        
+    protected createEdgeLabels(sourceRelation: RelationEntity, targetRelation: RelationEntity | null, notationType: NotationType | undefined, edgeId: string, ctx: GeneratorContext<Model>): SLabel[] {
+        const { idCache } = ctx;
+        const labels: SLabel[] = [];
+        const typeCardinality = targetRelation ? 'label:top' : 'label:top-left';
+        const typeRole = targetRelation ? 'label:bottom' : 'label:bottom-left';
+
+        labels.push(<SLabel>{
+            type: typeCardinality,
+            id: idCache.uniqueId(edgeId + '.label'),
+            text: this.getEdgeLabelText(notationType, this.getCardinality(sourceRelation)),
+            edgePlacement: {
+                rotate: true,
+                side: 'bottom',
+                position: 0.5,
+                offset: 7
+            }
+        });
+
+        labels.push(<SLabel>{
+            type: typeRole,
+            id: idCache.uniqueId(edgeId + '.roleLabel'),
+            text: sourceRelation.role ?? '',
+        });
+
+        //legacy code, unused since targetRelation is always null in the current implementation
+        /*
+        if (targetRelation !== null) {
+            let relationship = sourceRelation.$container;
+            labels.push(<SLabel>{
+                type: 'label:top',
+                id: idCache.uniqueId(edgeId + '.relationName'),
+                text: relationship.name
+            });
+
+            labels.push(<SLabel>{
+                type: 'label:top-right',
+                id: idCache.uniqueId(edgeId + '.additionalLabel'),
+                text: this.getEdgeLabelText(notationType, this.getCardinality(targetRelation))
+            });
+            
+            labels.push(<SLabel>{
+                type: 'label:bottom-right',
+                id: idCache.uniqueId(edgeId + 'additionalRoleLabel'),
+                text: this.getRoleLabelText(targetRelation)
+            })
+        }
         */
+       return labels;
+    }
         
 
     /**
@@ -288,6 +341,44 @@ export class ERDiagramGenerator extends LangiumDiagramGenerator {
             }
             return ' ';
         }
+
+    /**
+     * Labels an edge 'partial' for chen notation if the cardinality is 0..1 or 0..N
+     * @param relationEntity the {@link RelationEntity} whose edge type is to be determined
+     * @param notationType the notation form of the diagram
+     * @returns 'edge' or 'edge:partial' depending on the cardinality
+     */
+    protected getEdgeType(relationEntity: RelationEntity , notationType: NotationType | undefined): string {
+        if (notationType?.CHEN) {
+            if (relationEntity.cardinality?.ZERO_OR_ONE || relationEntity.cardinality?.ZERO_OR_MORE) {
+                return 'edge:partial'
+            }
+        }
+        return 'edge'
+    }
+
+        /**
+     * Removes the cardinality from the edge label for crowsfoot and bachman notation
+     * @param notationType the notation form of the diagram
+     * @param cardinality the cardinality of the edge
+     * @returns the cardinality or an empty string depending on the notation
+     */
+    protected getEdgeLabelText(notationType: NotationType | undefined, cardinality: string): string {
+        if (notationType && (notationType.CROWSFOOT || notationType.BACHMAN)) {
+            return ' '
+        } else return cardinality;
+    }
+
+    /**
+     * Transforms a cardinality type into a string.
+     * @param relationEntity the {@link RelationEntity} whose cardinality is to be transformed.
+     * @returns a string representation of the cardinality.
+     */
+    protected getCardinality(relationEntity: RelationEntity): string {
+        if (relationEntity.cardinality !== null && !(relationEntity.cardinality?.CARD_NONE)) {
+            return relationEntity.cardinality!.toString()
+        } else return ' '
+    }
 
     /**
      * Determines the label type for an attribute based on its type

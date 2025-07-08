@@ -6,8 +6,8 @@ import { injectable} from 'inversify';
 import { Diamond, DiamondNodeView, Hoverable, IViewArgs, PolylineEdgeView, PreRenderedView, RectangularNodeView, SEdgeImpl, Selectable, SNodeImpl, SPortImpl, svg, RenderingContext } from 'sprotty';
 import {EntityNode, NotationEdge, PopupButton, RelationshipNode} from './model.js';
 import { toDegrees, Point } from 'sprotty-protocol';
-import { isAggregation, RelationshipType } from './utils/relationship-types';
-import { DiagramTypes } from "./utils/diagram-types";
+//import { isAggregation, RelationshipType } from '../../language-server/src/utils/relationship-types.js';
+import { DiagramTypes } from "./utils/diagram-types.js";
 
 
 @injectable()
