@@ -131,7 +131,6 @@ export class ERDiagramGenerator extends LangiumDiagramGenerator {
             const secondaryEdge = this.createEdge(secondaryTarget, null, relationshipNodeId!, secondaryTargetId!, secondRelationshipType.toString(), ctx);
             edges.push(secondaryEdge);
         }
-
         
         return edges;
     }

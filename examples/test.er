@@ -1,4 +1,5 @@
 erdiagram test
+notation = uml
 
 entity Entity4 {
     attr
@@ -8,6 +9,13 @@ entity Entity3 {
     attr
 }
 
-relationship Relationship {
-    Entity4 -> Entity3
+
+entity Entity5 {
+    attr
+}
+
+
+
+relationship Rel {
+    Entity4 [1..N] -* Entity5
 }
