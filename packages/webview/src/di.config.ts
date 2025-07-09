@@ -9,7 +9,8 @@ import {
     RectangularNode,
     editLabelFeature,
     SCompartmentImpl,
-    SCompartmentView
+    SCompartmentView,
+    editFeature
 } from 'sprotty';
 import {
     LibavoidDiamondAnchor,
@@ -18,8 +19,8 @@ import {
     LibavoidRouter,
     RouteType,
 } from 'sprotty-routing-libavoid';
-import { RelationshipNode } from './model';
-import { RelationshipNodeView } from './views';
+import { InheritanceEdge, NotationEdge, RelationshipNode } from './model';
+import { InheritanceEdgeView, NotationEdgeView, RelationshipNodeView } from './views';
 import { GRAPH_TYPE } from '@biger/common';
 
 /**
@@ -46,6 +47,13 @@ const ERDiagramModule = new ContainerModule((bind, unbind, isBound, rebind) => {
     //
     configureModelElement(context, 'compartment:attributes', SCompartmentImpl, SCompartmentView);
     configureModelElement(context, 'compartment:attribute-row', SCompartmentImpl, SCompartmentView);
+
+    // Edges
+    configureModelElement(context, 'edge', NotationEdge, NotationEdgeView, { disable: [editFeature] });
+    configureModelElement(context, 'edge:inheritance', InheritanceEdge, InheritanceEdgeView, { disable: [editFeature] });
+    configureModelElement(context, 'edge:partial', NotationEdge, NotationEdgeView, { disable: [editFeature] });
+
+    configureModelElement(context, 'label:visibility', SLabelImpl, SLabelView, { enable: [editLabelFeature] });
     configureModelElement(context, 'label:relationship', SLabelImpl, SLabelView, { enable: [editLabelFeature] });
     configureModelElement(context, 'label:attributes', SLabelImpl, SLabelView, { enable: [editLabelFeature]});
     configureModelElement(context, 'label:text', SLabelImpl, SLabelView, { enable: [editLabelFeature] });

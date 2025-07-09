@@ -7,7 +7,8 @@ import { Diamond, DiamondNodeView, Hoverable, IViewArgs, PolylineEdgeView, PreRe
 import {EntityNode, NotationEdge, PopupButton, RelationshipNode} from './model.js';
 import { toDegrees, Point } from 'sprotty-protocol';
 //import { isAggregation, RelationshipType } from '../../language-server/src/utils/relationship-types.js';
-import { DiagramTypes } from "./utils/diagram-types.js";
+import { RelationshipType, isAggregation, DiagramType } from '@biger/common';
+
 
 
 @injectable()
@@ -113,13 +114,13 @@ export class NotationEdgeView extends PolylineEdgeView {
         const secondElem = segments[1];
         
         switch (edge.notation) {
-            case DiagramTypes.BACHMAN_NOTATION: {
+            case DiagramType.BACHMAN_NOTATION: {
                 return this.createBachmanEdge(source, target, secondElem, penultimateElem, edge.connectivity, edge.isSource);
             }
-            case DiagramTypes.CROWSFOOT_NOTATION: {
+            case DiagramType.CROWSFOOT_NOTATION: {
                 return this.createCrowsFootEdge(source, target, secondElem, penultimateElem, edge.connectivity, edge.isSource);
             }
-            case DiagramTypes.UML: {
+            case DiagramType.UML: {
                 if (edge.relationshipType !== null && edge.relationshipType !== RelationshipType.RELA_DEFAULT) {
                     return this.createUmlEdge(source, target, edge.relationshipType, secondElem, penultimateElem, edge.isSource);
                 }

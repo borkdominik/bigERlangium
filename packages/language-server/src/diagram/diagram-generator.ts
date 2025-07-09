@@ -2,9 +2,8 @@ import { GeneratorContext, LangiumDiagramGenerator } from "langium-sprotty";
 import { SModelRoot, SNode, SLabel, SEdge, SCompartment } from "sprotty-protocol";
 import { Attribute, Entity, Model, NotationType, RelationEntity, Relationship } from "../generated/ast.js";
 import { NotationEdge } from "./model-elements.js";
-import { RelationshipType } from "../utils/relationship-types.js" ;
 //import { NotationEdge } from "./model-elements.js";
-import { GRAPH_TYPE } from '@biger/common';
+import { GRAPH_TYPE, RelationshipType } from '@biger/common';
 
 /**
  * Generates a seralizable SModel representation of language elements
@@ -18,7 +17,7 @@ export class ERDiagramGenerator extends LangiumDiagramGenerator {
 
         const entityNodes = model.entities.map(e => this.generateNode(e, args))
         const relationshipNodes = model.relationships.map(r => this.generateRelationshipNode(r, args))
-        //const relationshipEdges = model.relationships.map(r => this.generateEdge(r, args))
+        const relationshipEdges = model.relationships.flatMap(r => this.generateRelationEdges(r, args))
         
         const graph = {
             type: GRAPH_TYPE,
@@ -26,7 +25,7 @@ export class ERDiagramGenerator extends LangiumDiagramGenerator {
             children: [
                 ...entityNodes,
                 ...relationshipNodes,
-                //...relationshipEdges
+                ...relationshipEdges
             ]
         };
 
@@ -93,21 +92,46 @@ export class ERDiagramGenerator extends LangiumDiagramGenerator {
 
         const relationshipNodeId = idCache.getId(relationship);
         const sourceId = idCache.getId(relationship.source?.entity.ref);
-        const targetId = idCache.getId(relationship.target?.entity.ref);
-        //const secondaryTargetIds = relationship.secondaryTargets?.map(target => idCache.getId(target.entity.ref)) || [];
-        const secondaryTargets = relationship.secondaryTargets || [];
 
-        let edges = [];
-        let relationshipType = relationship.type;
-        if (model.notation && model.notation.notationType.UML && secondaryTargets.length === 0) {
+        let edges: SEdge[] = [];
+        if (model.notation && model.notation.notationType.UML && relationship.targets.length <= 1) {
             //TODO: handle UML notation
         }
 
+        console.debug(`Generating edges for relationship ${relationship.name} with source ${relationship.source?.entity.ref} and targets ${relationship.targets.map(t => t.relationEntity.entity.ref)}`);
+
+        
         if (sourceId) { //add edge from the source entity to the relationship node
-            const sourceEdge = this.createEdge(relationship.source!, null, sourceId, relationshipNodeId!, relationshipType.toString(), ctx);
+            const type = relationship.targets[0].type ?? RelationshipType.RELA_DEFAULT; //default type if no type is specified
+            const sourceEdge = this.createEdge(relationship.source!, null, sourceId, relationshipNodeId!, type.toString(), ctx);
             edges.push(sourceEdge);
         }
+        
 
+        
+        for (let i = 0; i < relationship.targets.length; i++) {
+            const targetId = idCache.getId(relationship.targets[i].relationEntity.entity.ref);
+            if (targetId) {
+                const relationshipType = relationship.targets[i].type ?? RelationshipType.RELA_DEFAULT; //default type if no type is specified
+                let type = relationshipType.toString() as RelationshipType;
+                if (i == 0) { //attune edge of first target to source edge
+                    let secondRelationshipType = relationship.targets[i+1]?.type;
+                    if (secondRelationshipType) {
+                        if (secondRelationshipType.AGGREGATION_LEFT) {
+                            type = RelationshipType.AGGREGATION_RIGHT;
+                        } else if (secondRelationshipType.COMPOSITION_LEFT) {
+                            type = RelationshipType.COMPOSITION_RIGHT;
+                        }
+                    }
+                }
+                const targetEdge = this.createEdge(relationship.targets[i].relationEntity, null, relationshipNodeId!, targetId, type, ctx);
+                edges.push(targetEdge);
+            }
+        }
+        
+        
+
+        /*
         if (targetId) { //add edge from the target entity to the relationship node
             let secondRelationshipType = relationship.secondaryTypes?.[0];
             let type: RelationshipType = RelationshipType.RELA_DEFAULT;
@@ -132,6 +156,7 @@ export class ERDiagramGenerator extends LangiumDiagramGenerator {
             const secondaryEdge = this.createEdge(secondaryTarget, null, relationshipNodeId!, secondaryTargetId!, secondRelationshipType.toString(), ctx);
             edges.push(secondaryEdge);
         }
+        */
         
         return edges;
     }
@@ -149,6 +174,7 @@ export class ERDiagramGenerator extends LangiumDiagramGenerator {
      */
     
     protected createEdge(target: RelationEntity, source: RelationEntity | null, sourceId: string, targetId: string, relationshipType: string, ctx: GeneratorContext<Model>): SEdge {
+        
         let { idCache } = ctx;
         let { document } = ctx;
         let model = document.parseResult.value;
@@ -156,22 +182,35 @@ export class ERDiagramGenerator extends LangiumDiagramGenerator {
         const notationType = model.notation?.notationType;
         const relationship = target.$container as Relationship;
         const edgeId = idCache.uniqueId(`${sourceId}:${relationship.name}:${targetId}`, relationship);
+        
         const type = this.getEdgeType(target, notationType);
+        
 
-        let labels = this.createEdgeLabels(target, source, notationType, edgeId, ctx);
-        const edge = <SEdge>{ //TODO: replace SEdge with NotationEdge when available
+        //let labels = this.createEdgeLabels(target, source, notationType, edgeId, ctx);
+        const edge = <SEdge>{
             type: type,
             id: edgeId,
             sourceId: sourceId,
             targetId: targetId,
-            notation: notationType,
+            //notation: notationType,
             connectivity: this.getCardinality(target),
             isSource: target === relationship.source,
             relationshipType: relationshipType,
-            children: labels
+            //children: labels
         };
         this.traceProvider.trace(edge, relationship);
         return edge;
+        
+        /*
+        return <SEdge>{
+            id: edgeId,
+            sourceId: sourceId,
+            targetId: targetId,
+            type: type,
+            isSource: target === relationship.source,
+            relationshipType: relationshipType,
+        }
+        */
 
 
     }
@@ -375,7 +414,7 @@ export class ERDiagramGenerator extends LangiumDiagramGenerator {
      * @returns a string representation of the cardinality.
      */
     protected getCardinality(relationEntity: RelationEntity): string {
-        if (relationEntity.cardinality !== null && !(relationEntity.cardinality?.CARD_NONE)) {
+        if (relationEntity.cardinality && !(relationEntity.cardinality.CARD_NONE)) {
             return relationEntity.cardinality!.toString()
         } else return ' '
     }
