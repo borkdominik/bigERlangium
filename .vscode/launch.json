@@ -19,6 +19,19 @@
             "outFiles": [
                 "${workspaceFolder}/packages/extension/pack/**/*.js"
             ]
+        },
+        {
+            "name": "Attach to Language Server",
+            "type": "node",
+            "port": 6009,
+            "request": "attach",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "sourceMaps": true,
+            "outFiles": [
+                "${workspaceFolder}/{packages,examples}/*/{lib,out}/**/*.js"
+            ]
         }
     ]
 }
