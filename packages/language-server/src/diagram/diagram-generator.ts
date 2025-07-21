@@ -1,6 +1,6 @@
 import { GeneratorContext, LangiumDiagramGenerator } from "langium-sprotty";
 import { SModelRoot, SNode, SLabel, SEdge, SCompartment } from "sprotty-protocol";
-import { Attribute, Entity, Model, NotationType, RelationEntity, Relationship } from "../generated/ast.js";
+import { Attribute, Entity, Model, NotationType, RelationEntity, Relationship, RelationTarget } from "../generated/ast.js";
 import { NotationEdge } from "./model-elements.js";
 //import { NotationEdge } from "./model-elements.js";
 import { GRAPH_TYPE, RelationshipType } from '@biger/common';
@@ -59,7 +59,7 @@ export class ERDiagramGenerator extends LangiumDiagramGenerator {
         this.markerProvider.addDiagnosticMarker(attrCompartment, entity, ctx);
 
         const node: SNode = {
-            type: 'node',
+            type: 'node:entity',
             id: nodeId,
             children: [
                 label,
@@ -102,8 +102,9 @@ export class ERDiagramGenerator extends LangiumDiagramGenerator {
 
         
         if (sourceId) { //add edge from the source entity to the relationship node
-            const type = relationship.targets[0].type ?? RelationshipType.RELA_DEFAULT; //default type if no type is specified
-            const sourceEdge = this.createEdge(relationship.source!, null, sourceId, relationshipNodeId!, type.toString(), ctx);
+            //const type = relationship.targets[0].type ?? RelationshipType.RELA_DEFAULT; //default type if no type is specified
+            const type = this.getRelationshipType(relationship.targets[0]);
+            const sourceEdge = this.createEdge(relationship.source!, null, sourceId, relationshipNodeId!, type, ctx);
             edges.push(sourceEdge);
         }
         
@@ -112,8 +113,7 @@ export class ERDiagramGenerator extends LangiumDiagramGenerator {
         for (let i = 0; i < relationship.targets.length; i++) {
             const targetId = idCache.getId(relationship.targets[i].relationEntity.entity.ref);
             if (targetId) {
-                const relationshipType = relationship.targets[i].type ?? RelationshipType.RELA_DEFAULT; //default type if no type is specified
-                let type = relationshipType.toString() as RelationshipType;
+                let type = this.getRelationshipType(relationship.targets[i]);
                 if (i == 0) { //attune edge of first target to source edge
                     let secondRelationshipType = relationship.targets[i+1]?.type;
                     if (secondRelationshipType) {
@@ -186,17 +186,17 @@ export class ERDiagramGenerator extends LangiumDiagramGenerator {
         const type = this.getEdgeType(target, notationType);
         
 
-        //let labels = this.createEdgeLabels(target, source, notationType, edgeId, ctx);
+        let labels = this.createEdgeLabels(target, source, notationType, edgeId, ctx);
         const edge = <SEdge>{
             type: type,
             id: edgeId,
             sourceId: sourceId,
             targetId: targetId,
-            //notation: notationType,
+            notation: this.getNotationType(model),
             connectivity: this.getCardinality(target),
             isSource: target === relationship.source,
             relationshipType: relationshipType,
-            //children: labels
+            children: labels
         };
         this.traceProvider.trace(edge, relationship);
         return edge;
@@ -322,7 +322,7 @@ export class ERDiagramGenerator extends LangiumDiagramGenerator {
         const visibilityLabel = <SLabel>{
             type: 'label:visibility',
             id: attributeId + '.visibility',
-            text: attr.visibility ? attr.visibility?.toString() : ''
+            text: this.getAttributeVisibility(attr),
         }
 
         const nameLabel = <SLabel>{
@@ -414,9 +414,13 @@ export class ERDiagramGenerator extends LangiumDiagramGenerator {
      * @returns a string representation of the cardinality.
      */
     protected getCardinality(relationEntity: RelationEntity): string {
-        if (relationEntity.cardinality && !(relationEntity.cardinality.CARD_NONE)) {
-            return relationEntity.cardinality!.toString()
-        } else return ' '
+        if (!relationEntity.cardinality || relationEntity.cardinality.CARD_NONE) {
+            return ' '
+        } else return relationEntity.cardinality.MANY ?? 
+            relationEntity.cardinality.ONE ??
+            relationEntity.cardinality.ZERO_OR_ONE ??
+            relationEntity.cardinality.ZERO_OR_MORE ?? 
+            ''
     }
 
     /**
@@ -424,16 +428,52 @@ export class ERDiagramGenerator extends LangiumDiagramGenerator {
      * @param attr the attribute whose label type is to be determined
      * @returns a string representing the label type, starting with 'label:' 
      */
-        protected getAttributeLabelType(attr: Attribute): string {
-            console.debug(attr)
-            if (attr.type?.KEY) {
-                return 'label:key'
-            } else if (attr.type?.PARTIAL_KEY) {
-                return 'label:partial-key'
-            } else if (attr.type?.DERIVED) {
-                return 'label:derived'
-            } else {
-                return 'label:text'
-            }
+    protected getAttributeLabelType(attr: Attribute): string {
+        //console.debug(attr)
+        if (attr.type?.KEY) {
+            return 'label:key'
+        } else if (attr.type?.PARTIAL_KEY) {
+            return 'label:partial-key'
+        } else if (attr.type?.DERIVED) {
+            return 'label:derived'
+        } else {
+            return 'label:text'
         }
+    }
+
+    protected getAttributeVisibility(attr: Attribute): string {
+        if (!attr.visibility || attr.visibility.VISI_NONE) {
+            return ' '
+        } else if (attr.visibility.PUBLIC) {
+            return attr.visibility.PUBLIC;
+        } else if (attr.visibility.PRIVATE) {
+            return attr.visibility.PRIVATE;
+        } else if (attr.visibility.PROTECTED) {
+            return attr.visibility.PROTECTED;
+        } else if (attr.visibility.PACKAGE) {
+            return attr.visibility.PACKAGE;
+        } else {
+            console.warn(`Unknown visibility type: ${attr.visibility}`);
+            return ' '
+        }
+    }
+
+    protected getRelationshipType(target: RelationTarget): string {
+        if (!target.type || target.type.RELA_DEFAULT) {
+            return RelationshipType.RELA_DEFAULT.toString();
+        } else return target.type.AGGREGATION_LEFT ??
+            target.type.AGGREGATION_RIGHT ??
+            target.type.COMPOSITION_LEFT ??
+            target.type.COMPOSITION_RIGHT ??
+            ''
+    }
+
+    protected getNotationType(model: Model): string {
+        return model.notation?.notationType.BACHMAN ??
+            model.notation?.notationType.CROWSFOOT ??
+            model.notation?.notationType.CHEN ??
+            model.notation?.notationType.UML ??
+            model.notation?.notationType.NOTA_DEFAULT ??
+            ''
+    }
 }
