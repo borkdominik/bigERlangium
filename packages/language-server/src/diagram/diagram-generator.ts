@@ -18,6 +18,7 @@ export class ERDiagramGenerator extends LangiumDiagramGenerator {
         const entityNodes = model.entities.map(e => this.generateNode(e, args))
         const relationshipNodes = model.relationships.map(r => this.generateRelationshipNode(r, args))
         const relationshipEdges = model.relationships.flatMap(r => this.generateRelationEdges(r, args))
+        const inheritanceEdges = model.entities.map(e => this.inheritanceEdges(e, args)).flatMap(edge => edge ? [edge] : []);
         
         const graph = {
             type: GRAPH_TYPE,
@@ -25,7 +26,8 @@ export class ERDiagramGenerator extends LangiumDiagramGenerator {
             children: [
                 ...entityNodes,
                 ...relationshipNodes,
-                ...relationshipEdges
+                ...relationshipEdges,
+                ...inheritanceEdges
             ]
         };
 
@@ -406,6 +408,29 @@ export class ERDiagramGenerator extends LangiumDiagramGenerator {
         if (notationType && (notationType.CROWSFOOT || notationType.BACHMAN)) {
             return ' '
         } else return cardinality;
+    }
+
+    /**
+     * Generates an edge for inheritance relationships between entities
+     * @param entity an entity from the Langium model
+     * @param idCache the {@link IdCache} for the current diagram 
+     * @returns an {@link SEdge} representing the inheritance relationship if there is one, otherwise null
+     */
+    protected inheritanceEdges(entity: Entity, ctx: GeneratorContext<Model>): SEdge | null {
+
+        if (entity.extends) {
+            const { idCache } = ctx;
+            let sourceId = idCache.getId(entity);
+            let targetId = idCache.getId(entity.extends?.ref);
+            let edge = <SEdge>{
+                sourceId: sourceId,
+                targetId: targetId,
+                id: idCache.uniqueId(entity + sourceId! + ':extends:' + targetId),
+                type: 'edge:inheritance'
+            }
+            return edge;
+        }
+        else return null;
     }
 
     /**
