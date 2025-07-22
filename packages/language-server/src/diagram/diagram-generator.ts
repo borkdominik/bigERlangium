@@ -97,14 +97,13 @@ export class ERDiagramGenerator extends LangiumDiagramGenerator {
 
         let edges: SEdge[] = [];
         if (model.notation && model.notation.notationType.UML && relationship.targets.length <= 1) {
-            //TODO: handle UML notation
+            // add UML specific edges here (if required)
         }
 
         console.debug(`Generating edges for relationship ${relationship.name} with source ${relationship.source?.entity.ref} and targets ${relationship.targets.map(t => t.relationEntity.entity.ref)}`);
 
         
         if (sourceId) { //add edge from the source entity to the relationship node
-            //const type = relationship.targets[0].type ?? RelationshipType.RELA_DEFAULT; //default type if no type is specified
             const type = this.getRelationshipType(relationship.targets[0]);
             const sourceEdge = this.createEdge(relationship.source!, null, sourceId, relationshipNodeId!, type, ctx);
             edges.push(sourceEdge);
@@ -130,35 +129,6 @@ export class ERDiagramGenerator extends LangiumDiagramGenerator {
                 edges.push(targetEdge);
             }
         }
-        
-        
-
-        /*
-        if (targetId) { //add edge from the target entity to the relationship node
-            let secondRelationshipType = relationship.secondaryTypes?.[0];
-            let type: RelationshipType = RelationshipType.RELA_DEFAULT;
-            if (relationshipType.AGGREGATION_RIGHT || relationshipType.COMPOSITION_RIGHT) {
-                type = relationshipType.toString() as RelationshipType;
-            } else if (secondRelationshipType.AGGREGATION_LEFT) {
-                //relationshipType.AGGREGATION_RIGHT = RelationshipType.AGGREGATION_RIGHT;
-                type = RelationshipType.AGGREGATION_RIGHT;
-            } else if (secondRelationshipType.COMPOSITION_LEFT) {
-                //relationshipType.COMPOSITION_LEFT = RelationshipType.COMPOSITION_LEFT;
-                type = RelationshipType.COMPOSITION_RIGHT;
-            }
-            const targetEdge = this.createEdge(relationship.target!, null, relationshipNodeId!, targetId, relationshipType.toString(), ctx);
-            edges.push(targetEdge);
-        }
-
-        for (let i = 0; i < secondaryTargets.length; i++) { //add edges from the secondary targets to the relationship node
-            const secondaryTarget = secondaryTargets[i];
-            const secondRelationshipType = relationship.secondaryTypes?.[i];
-
-            const secondaryTargetId = idCache.getId(secondaryTarget);
-            const secondaryEdge = this.createEdge(secondaryTarget, null, relationshipNodeId!, secondaryTargetId!, secondRelationshipType.toString(), ctx);
-            edges.push(secondaryEdge);
-        }
-        */
         
         return edges;
     }
@@ -202,19 +172,6 @@ export class ERDiagramGenerator extends LangiumDiagramGenerator {
         };
         this.traceProvider.trace(edge, relationship);
         return edge;
-        
-        /*
-        return <SEdge>{
-            id: edgeId,
-            sourceId: sourceId,
-            targetId: targetId,
-            type: type,
-            isSource: target === relationship.source,
-            relationshipType: relationshipType,
-        }
-        */
-
-
     }
         
     protected createEdgeLabels(sourceRelation: RelationEntity, targetRelation: RelationEntity | null, notationType: NotationType | undefined, edgeId: string, ctx: GeneratorContext<Model>): SLabel[] {
@@ -454,7 +411,6 @@ export class ERDiagramGenerator extends LangiumDiagramGenerator {
      * @returns a string representing the label type, starting with 'label:' 
      */
     protected getAttributeLabelType(attr: Attribute): string {
-        //console.debug(attr)
         if (attr.type?.KEY) {
             return 'label:key'
         } else if (attr.type?.PARTIAL_KEY) {
@@ -466,6 +422,11 @@ export class ERDiagramGenerator extends LangiumDiagramGenerator {
         }
     }
 
+    /**
+     * Determines the visibility of an attribute
+     * @param attr the attribute whose visibility is to be determined
+     * @returns a string representing the visibility, e.g. 'public', 'private', 'protected', 'package' or ' '
+     */
     protected getAttributeVisibility(attr: Attribute): string {
         if (!attr.visibility || attr.visibility.VISI_NONE) {
             return ' '
@@ -483,6 +444,12 @@ export class ERDiagramGenerator extends LangiumDiagramGenerator {
         }
     }
 
+
+    /**
+     * Determines the relationship type for a given target
+     * @param target the target whose relationship type is to be determined
+     * @returns a string representing the relationship type, e.g. '->', '-o', 'o-', '-*' or '*-'
+     */
     protected getRelationshipType(target: RelationTarget): string {
         if (!target.type || target.type.RELA_DEFAULT) {
             return RelationshipType.RELA_DEFAULT.toString();
@@ -493,6 +460,11 @@ export class ERDiagramGenerator extends LangiumDiagramGenerator {
             ''
     }
 
+    /**
+     * Determines the notation type for the model
+     * @param model the model whose notation type is to be determined
+     * @returns a string representing the notation type, e.g. 'BACHMAN', 'CROWSFOOT', 'CHEN', 'UML' or 'NOTA_DEFAULT'
+     */
     protected getNotationType(model: Model): string {
         return model.notation?.notationType.BACHMAN ??
             model.notation?.notationType.CROWSFOOT ??
