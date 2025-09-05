@@ -1,5 +1,5 @@
-import { DiamondNode, EdgePlacement, PreRenderedElement, RectangularNode, SLabelImpl } from 'sprotty';
-import { LibavoidEdge } from 'sprotty-routing-libavoid';
+import { DiamondNode, EdgePlacement, PreRenderedElement, RectangularNode, SEdgeImpl, SLabelImpl } from 'sprotty';
+//import { LibavoidEdge } from 'sprotty-routing-libavoid';
 
 
 
@@ -22,7 +22,7 @@ export class RelationshipNode extends DiamondNode {
 /**
  * edge representing a link between two nodes
  */
-export class NotationEdge extends LibavoidEdge {
+export class NotationEdge extends SEdgeImpl {
     isSource: boolean;
     notation: string;
     connectivity: string;
@@ -86,7 +86,7 @@ export class RightRoleLabel extends SLabelImpl {
     };
 }
 
-export class InheritanceEdge extends LibavoidEdge {
+export class InheritanceEdge extends SEdgeImpl {
 
 }
 

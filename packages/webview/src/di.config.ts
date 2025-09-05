@@ -12,6 +12,7 @@ import {
     editFeature,
     expandFeature
 } from 'sprotty';
+/*
 import {
     LibavoidDiamondAnchor,
     LibavoidEllipseAnchor,
@@ -19,6 +20,7 @@ import {
     LibavoidRouter,
     RouteType,
 } from 'sprotty-routing-libavoid';
+ */
 import { CardinalityLabel, EntityNode, InheritanceEdge, LeftCardinalityLabel, LeftRoleLabel, NotationEdge, RelationshipNode, RightCardinalityLabel, RightRoleLabel, RoleLabel } from './model';
 import { EntityNodeView, InheritanceEdgeView, NotationEdgeView, RelationshipNodeView } from './views';
 import { GRAPH_TYPE } from '@biger/common';
@@ -34,11 +36,11 @@ const ERDiagramModule = new ContainerModule((bind, unbind, isBound, rebind) => {
     const context = { bind, unbind, isBound, rebind };
 
     // Libavoid router bindings
-    bind(LibavoidRouter).toSelf().inSingletonScope();
-    bind(TYPES.IEdgeRouter).toService(LibavoidRouter);
-    bind(TYPES.IAnchorComputer).to(LibavoidDiamondAnchor).inSingletonScope();
-    bind(TYPES.IAnchorComputer).to(LibavoidEllipseAnchor).inSingletonScope();
-    bind(TYPES.IAnchorComputer).to(LibavoidRectangleAnchor).inSingletonScope();
+    //bind(LibavoidRouter).toSelf().inSingletonScope();
+    //bind(TYPES.IEdgeRouter).toService(LibavoidRouter);
+    //bind(TYPES.IAnchorComputer).to(LibavoidDiamondAnchor).inSingletonScope();
+    //bind(TYPES.IAnchorComputer).to(LibavoidEllipseAnchor).inSingletonScope();
+    //bind(TYPES.IAnchorComputer).to(LibavoidRectangleAnchor).inSingletonScope();
 
     configureModelElement(context, GRAPH_TYPE, SGraphImpl, SGraphView);
     // Nodes
@@ -95,12 +97,13 @@ export function createDiagramContainer(widgetId: string): Container {
     });
 
     // configure libavoid router
-    const router = container.get(LibavoidRouter);
-    configureRouter(router);
+    //const router = container.get(LibavoidRouter);
+    //configureRouter(router);
 
     return container;
 }
 
+/*
 function configureRouter(router: LibavoidRouter): void {
     router.setOptions({
         routingType: RouteType.Orthogonal,
@@ -114,3 +117,4 @@ function configureRouter(router: LibavoidRouter): void {
         nudgeOrthogonalTouchingColinearSegments: false,
     });
 }
+    */

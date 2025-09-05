@@ -5,7 +5,7 @@ import { Container } from 'inversify';
 import { SprottyDiagramIdentifier } from 'sprotty-vscode-webview';
 import { SprottyLspEditStarter } from 'sprotty-vscode-webview/lib/lsp/editing';
 import { createDiagramContainer } from './di.config';
-import { load as loadLibavoidRouter } from 'sprotty-routing-libavoid';
+//import { load as loadLibavoidRouter } from 'sprotty-routing-libavoid';
 
 export class DiagramWebviewStarter extends SprottyLspEditStarter {
     
@@ -18,6 +18,10 @@ export class DiagramWebviewStarter extends SprottyLspEditStarter {
     }
 }
 
+/*
 loadLibavoidRouter().then(() => {
     new DiagramWebviewStarter().start();
 })
+    */
+
+new DiagramWebviewStarter().start();
