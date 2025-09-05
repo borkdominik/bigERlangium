@@ -26,7 +26,7 @@ export class NotationEdge extends LibavoidEdge {
     isSource: boolean;
     notation: string;
     connectivity: string;
-    relationshipType: string;;
+    relationshipType: string;
 }
 
 /**

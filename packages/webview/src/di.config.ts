@@ -5,11 +5,12 @@ import { Container, ContainerModule } from 'inversify';
 import {
     configureModelElement, ConsoleLogger, HtmlRootImpl, HtmlRootView, LogLevel, overrideViewerOptions, 
     PreRenderedElementImpl, PreRenderedView, SGraphView, SLabelView, SRoutingHandleImpl, SRoutingHandleView, 
-    TYPES, loadDefaultModules, SGraphImpl, SLabelImpl, labelEditUiModule, RectangularNodeView, 
-    RectangularNode,
+    TYPES, loadDefaultModules, SGraphImpl, SLabelImpl, labelEditUiModule, 
     editLabelFeature,
     SCompartmentImpl,
-    SCompartmentView
+    SCompartmentView,
+    editFeature,
+    expandFeature
 } from 'sprotty';
 import {
     LibavoidDiamondAnchor,
@@ -18,8 +19,8 @@ import {
     LibavoidRouter,
     RouteType,
 } from 'sprotty-routing-libavoid';
-import { RelationshipNode } from './model';
-import { RelationshipNodeView } from './views';
+import { CardinalityLabel, EntityNode, InheritanceEdge, LeftCardinalityLabel, LeftRoleLabel, NotationEdge, RelationshipNode, RightCardinalityLabel, RightRoleLabel, RoleLabel } from './model';
+import { EntityNodeView, InheritanceEdgeView, NotationEdgeView, RelationshipNodeView } from './views';
 import { GRAPH_TYPE } from '@biger/common';
 
 /**
@@ -40,17 +41,36 @@ const ERDiagramModule = new ContainerModule((bind, unbind, isBound, rebind) => {
     bind(TYPES.IAnchorComputer).to(LibavoidRectangleAnchor).inSingletonScope();
 
     configureModelElement(context, GRAPH_TYPE, SGraphImpl, SGraphView);
-    configureModelElement(context, 'node', RectangularNode, RectangularNodeView);
+    // Nodes
+    //configureModelElement(context, 'node', RectangularNode, RectangularNodeView);
+    configureModelElement(context, 'node:entity', EntityNode, EntityNodeView, { enable: [expandFeature] });
     configureModelElement(context, 'node:relationship', RelationshipNode, RelationshipNodeView);
-    configureModelElement(context, 'label:name', SLabelImpl, SLabelView, { enable: [editLabelFeature]});
-    //
+    
+    
+    // Compartments
     configureModelElement(context, 'compartment:attributes', SCompartmentImpl, SCompartmentView);
     configureModelElement(context, 'compartment:attribute-row', SCompartmentImpl, SCompartmentView);
+
+    // Edges
+    configureModelElement(context, 'edge', NotationEdge, NotationEdgeView, { disable: [editFeature] });
+    configureModelElement(context, 'edge:inheritance', InheritanceEdge, InheritanceEdgeView, { disable: [editFeature] });
+    configureModelElement(context, 'edge:partial', NotationEdge, NotationEdgeView, { disable: [editFeature] });
+
+    // Labels
+    configureModelElement(context, 'label:name', SLabelImpl, SLabelView, { enable: [editLabelFeature]});
+    configureModelElement(context, 'label:visibility', SLabelImpl, SLabelView, { enable: [editLabelFeature] });
     configureModelElement(context, 'label:relationship', SLabelImpl, SLabelView, { enable: [editLabelFeature] });
+    configureModelElement(context, 'label:top', CardinalityLabel, SLabelView);
+    configureModelElement(context, 'label:top-left', LeftCardinalityLabel, SLabelView);
+    configureModelElement(context, 'label:top-right', RightCardinalityLabel, SLabelView);
+    configureModelElement(context, 'label:bottom-left', LeftRoleLabel, SLabelView);
+    configureModelElement(context, 'label:bottom-right', RightRoleLabel, SLabelView);
+    configureModelElement(context, 'label:bottom', RoleLabel, SLabelView);
     configureModelElement(context, 'label:attributes', SLabelImpl, SLabelView, { enable: [editLabelFeature]});
     configureModelElement(context, 'label:text', SLabelImpl, SLabelView, { enable: [editLabelFeature] });
     configureModelElement(context, 'label:key', SLabelImpl, SLabelView, { enable: [editLabelFeature] });
     configureModelElement(context, 'label:partial-key', SLabelImpl, SLabelView, { enable: [editLabelFeature] });
+    configureModelElement(context, 'label:derived', SLabelImpl, SLabelView, { enable: [editLabelFeature] });
 
     //
     //configureModelElement(context, 'edge', RelationshipEdge, PolylineEdgeView);
