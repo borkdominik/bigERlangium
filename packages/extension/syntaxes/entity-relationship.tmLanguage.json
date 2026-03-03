@@ -10,9 +10,41 @@
       "include": "#comments"
     },
     {
-      "name": "keyword.control.entity-relationship",
-      "match": "\\b(0\\.\\.N|1\\.\\.N|N|bachman|chen|crowfoot|default|derived|entity|erdiagram|extends|key|multivalued|none|notation|optional|package|partial_key|private|protected|public|relationship|uml|weak)\\b|\\B(-o)\\b|\\b(o-)\\B"
+			"name": "constant.language.erdiagram",
+			"match": "\\b(erdiagram)\\b"
+		},
+    {
+      "name": "storage.type.erdiagram",
+      "match": "\\b(notation)\\b"
     },
+    {
+      "name": "storage.modifier.erdiagram",
+      "match": "\\b(default|bachman|crowsfoot|chen|uml)\\b"
+    },
+    {
+			"name": "entity.name.type.erdiagram",
+			"match": "\\b(entity|rel)\\b"
+		},
+    {
+      "name": "keyword.entity-relationship",
+      "match": "\\->|\\B(-o)\\b|\\b(o-)\\B|\\B(-\\*)\\B|\\B(\\*-)\\B"
+    },
+    {
+      "name": "keyword.control.entity-relationship",
+      "match": "\\b(1|0\\.\\.N|1\\.\\.N|N|NONE)\\b"
+    },
+    {
+      "name": "entity.name.tag.entity-relationship",
+      "match": "\\b(extends|weak)\\b"
+    },
+    {
+      "name": "storage.modifier.entity-relationship",
+      "match": "\\+|\\#|\\~|\\-(?!>)|\\b(public|private|protected|package|none)\\b"
+    },
+    {
+			"name": "entity.other.attribute-name.entity-relationship",
+			"match": "\\b(key|derived|multivalued|optional|partial-key)\\b"
+		},
     {
       "name": "string.quoted.double.entity-relationship",
       "begin": "\"",
