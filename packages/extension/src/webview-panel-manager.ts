@@ -5,6 +5,18 @@ import { addLspLabelEditActionHandler, addWorkspaceEditActionHandler } from 'spr
 
 export class ERWebviewPanelManager extends LspWebviewPanelManager {
 
+    /**
+     * Keep VS Code's canonical URI serialization (e.g. `file:///c%3A/...` on Windows)
+     * so Langium's URI matching can consistently map text-document updates to diagram servers.
+     */
+    protected override async createDiagramIdentifier(uri: vscode.Uri, diagramType?: string): Promise<SprottyDiagramIdentifier | undefined> {
+        const identifier = await super.createDiagramIdentifier(uri, diagramType);
+        if (identifier) {
+            identifier.uri = uri.toString();
+        }
+        return identifier;
+    }
+
     // Override to customize URIs for local resources, scripts, and styles
     protected override createWebview(identifier: SprottyDiagramIdentifier): vscode.WebviewPanel {
         const extensionPath = this.options.extensionUri.fsPath;
