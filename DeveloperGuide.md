@@ -7,7 +7,7 @@ The code can be found in the `packages/` directory with the following modules:
 - `language-server/` - main *server-side* module responsible for *grammar*, *language services* (e.g. validation) and diagram generation.
 - `webview/` - main *client-side* module responsible for visual content, including diagram styling, VSCode buttons and edge-routing.
 - `extension/` - editor-spcific code, mainly for managing visual content, such as syntax highlighting and view panels.
-- `common/` - space for code used by multiple other modules, though discouraged to keep separation. Contains some potentially useful utilities, currently unused.
+- `common/` - space for code used by multiple other modules, discouraged for complex functionalities to keep separation. Contains some potentially useful utilities like common type enumerations.
 
 relevant files:
 - [entity-relationship.langium](./packages/language-server/src/entity-relationship.langium) - controls functional language features, e.g. keywords

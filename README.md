@@ -7,7 +7,7 @@ For information for developers see the [Developer Guide](./DeveloperGuide.md)
 ## Getting Started
 
 Requirements:
-- [Node.js](https://nodejs.org/en/) 18 or above
+- [Node.js](https://nodejs.org/en/) 20.10 or above
 - [VS Code](https://code.visualstudio.com/) 1.67 or above
 - [yarn](https://classic.yarnpkg.com/lang/en/docs/install/)
 
