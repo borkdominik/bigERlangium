@@ -11,6 +11,11 @@ import { GRAPH_TYPE, RelationshipType } from '@biger/common';
  */
 export class ERDiagramGenerator extends LangiumDiagramGenerator {
 
+    /**
+     * Starts diagram generation, calls diagram element generation based on the given Model
+     * @param args model to convert to graphical representation
+     * @returns graphical model root node
+     */
     protected generateRoot(args: GeneratorContext<Model>): SModelRoot {
         const { document } = args;
         const model = document.parseResult.value;
@@ -35,6 +40,12 @@ export class ERDiagramGenerator extends LangiumDiagramGenerator {
         return graph;
     }
 
+    /**
+     * Generates a graph node based on an entity
+     * @param entity entity the node should represent
+     * @param ctx context of the graph
+     * @returns graph node to be used in the graph representation
+     */
     protected generateNode(entity: Entity, ctx: GeneratorContext<Model>): SNode {
         const { idCache } = ctx;
         const nodeId = idCache.uniqueId(entity.name, entity);
@@ -46,6 +57,7 @@ export class ERDiagramGenerator extends LangiumDiagramGenerator {
         };
         this.traceProvider.trace(label, entity, 'name');
 
+        //map attributes of entity to node
         const attributes = entity.attributes.map(attr => this.createAttributeLabels(attr, nodeId, ctx));
         const attrCompartment = <SCompartment>{
             type: 'compartment:attributes',

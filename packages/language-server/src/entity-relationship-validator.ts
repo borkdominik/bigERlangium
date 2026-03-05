@@ -26,14 +26,23 @@ export class EntityRelationshipValidator {
     /*
     *   MODEL
     */
-    // Check if the model has a name
+
+    /**
+     *  Check if the model has a name
+     * @param model model to check
+     * @param accept validation acceptor containing information about the validation (error messages, warnings, ...)
+     */
     checkModelName(model: Model, accept: ValidationAcceptor): void {
         if (!model.name || model.name.trim() === "") {
             accept("error", "Missing model header 'erdiagram <name>'", { node: model, range: { start: { line: 0, character: 0 }, end: { line: 1, character: 0 } } });
         }
     }
 
-    // Performs a check on all entities of the model for name duplicates
+    /**
+     * Performs a check on all entities of the model for name duplicates
+     * @param model model to check
+     * @param accept validation acceptor containing information about the validation (error messages, warnings, ...)
+     */
     checkModelEntityNamesForDuplicates(model: Model, accept: ValidationAcceptor): void {
         let entities = model.entities;
         let entityNames = entities.map(entity => entity.name);
@@ -44,7 +53,11 @@ export class EntityRelationshipValidator {
         })
     }
 
-    // Performs a check on all relationships of the model for name duplicates
+    /**
+     * Performs a check on all relationships of the model for name duplicates
+     * @param model model to check
+     * @param accept validation acceptor containing information about the validation (error messages, warnings, ...)
+     */
     checkModelRelationshipNamesForDuplicates(model: Model, accept: ValidationAcceptor): void {
         let relationships = model.relationships;
         let relationshipNames = relationships.map(entity => entity.name);
@@ -58,7 +71,12 @@ export class EntityRelationshipValidator {
     /*
     *   ENTITY
     */
-    // Performs a check on an entity name to check for the capitalization of the first letter of its name
+   
+    /**
+     * Performs a check on an entity name to check for the capitalization of the first letter of its name
+     * @param entity entity to check
+     * @param accept validation acceptor containing information about the validation (error messages, warnings, ...)
+     */
     checkEntityStartsWithCapitalLetter(entity: Entity, accept: ValidationAcceptor): void {
         if (entity.name) {
             if (!/[A-Z]/.test(entity.name[0])) {
@@ -67,7 +85,12 @@ export class EntityRelationshipValidator {
         }
     }
 
-    // Performs a check on an entity to confirm that it has a valid key
+    /**
+     * Performs a check on an entity to confirm that it has a valid key
+     * @param entity entity to check
+     * @param accept validation acceptor containing information about the validation (error messages, warnings, ...)
+     * @returns 
+     */
     checkEntityKeys(entity: Entity, accept: ValidationAcceptor) {
         if (entity.weak) {
             // Check for weak entities
@@ -122,7 +145,12 @@ export class EntityRelationshipValidator {
     /*
     *   RELATIONSHIP
     */
-    // Check if an incorrect version of Composition/Aggregation is used depending on the chosen diagram type.
+
+    /**
+     * Check if an incorrect version of Composition/Aggregation is used depending on the chosen diagram type.
+     * @param relationship relationship to check
+     * @param accept validation acceptor containing information about the validation (error messages, warnings, ...)
+     */
     checkRelationshipAggregationCompositionForNotations(relationship: Relationship, accept: ValidationAcceptor){
         let model = relationship.$container;
         if (isModel(model)) {
@@ -155,7 +183,12 @@ export class EntityRelationshipValidator {
     /*
     *   RELATION ENTITY
     */
-    // checks the cardinality of a relationship entity when the notation is set to bachman, chen or crowsfoot to discourage incorrect use of cardinalities
+
+    /**
+     * checks the cardinality of a relationship entity when the notation is set to bachman, chen or crowsfoot to discourage incorrect use of cardinalities
+     * @param relation relation entity to check
+     * @param accept validation acceptor containing information about the validation (error messages, warnings, ...)
+     */
     checkRelationEntityCardinalityForNotations(relation: RelationEntity, accept: ValidationAcceptor) {
         let model = relation.$container.$container;
         if (isModel(model)) {
@@ -176,7 +209,12 @@ export class EntityRelationshipValidator {
     /*
     *   ATTRIBUTE
     */
-    // checks if visibility modifiers are used outside of uml notation
+
+    /**
+     * checks if visibility modifiers are used outside of uml notation
+     * @param attribute attribute to check
+     * @param accept validation acceptor containing information about the validation (error messages, warnings, ...)
+     */
     checkAttributeVisibilityForUMLNotation(attribute: Attribute, accept: ValidationAcceptor){
         let model = attribute.$container.$container;
         if(isModel(model)){
@@ -190,7 +228,12 @@ export class EntityRelationshipValidator {
     /*
     *   ENTITY & RELATIONSHIP
     */
-    // Performs a check on duplicate attribute names within an element
+
+    /**
+     * Performs a check on duplicate attribute names within an element
+     * @param element entity or relationship to check
+     * @param accept validation acceptor containing information about the validation (error messages, warnings, ...)
+     */
     checkEntityOrRelationshipAttributes(element: Entity | Relationship, accept: ValidationAcceptor) {
         let attributes = element.attributes;
         let attributeNames = element.attributes.map(attribute => attribute.name);
