@@ -41,6 +41,7 @@ const copyLibavoidPlugin = ({
 const nodeContext = await esbuild.context({
     entryPoints: [
         'src/main.ts',
+        'src/export-cli.ts',
         '../language-server/src/main.ts',
         '../common/src/index.ts'
     ],

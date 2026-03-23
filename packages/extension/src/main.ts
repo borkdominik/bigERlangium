@@ -4,6 +4,7 @@ import * as path from 'node:path';
 import { LanguageClient, TransportKind } from 'vscode-languageclient/node.js';
 import { registerDefaultCommands, registerLspEditCommands } from 'sprotty-vscode';
 import { ERWebviewPanelManager } from './webview-panel-manager';
+import { registerExportCommands } from './export/commands';
 
 let languageClient: LanguageClient;
 
@@ -19,6 +20,7 @@ export function activate(context: vscode.ExtensionContext): void {
     });
     registerDefaultCommands(webviewPanelManager, context, { extensionPrefix: 'biger' });
     registerLspEditCommands(webviewPanelManager, context, { extensionPrefix: 'biger' });
+    registerExportCommands(context, languageClient);
 }
 
 // This function is called when the extension is deactivated.

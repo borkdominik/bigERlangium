@@ -3,9 +3,11 @@ import { NodeFileSystem } from 'langium/node';
 import { createConnection, ProposedFeatures } from 'vscode-languageserver/node.js';
 import { createEntityRelationshipServices } from './entity-relationship-module.js';
 import { addDiagramHandler, addDiagramSelectionHandler, addHoverPopupHandler, addTextSelectionHandler } from 'langium-sprotty';
+import { registerExportRequestHandler } from './export/export-request-handler.js';
 
 // create a connection to the client
 const connection = createConnection(ProposedFeatures.all);
+registerExportRequestHandler(connection);
 
 // inject the language services
 const { shared, EntityRelationship } = createEntityRelationshipServices({ connection, ...NodeFileSystem });

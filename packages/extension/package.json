@@ -13,9 +13,13 @@
         "prepare": "yarn run clean && yarn run build",
         "clean": "rimraf pack",
         "build": "node esbuild.mjs",
-        "watch": "node esbuild.mjs --watch"
+        "watch": "node esbuild.mjs --watch",
+        "export:cli": "node ./pack/extension/src/export-cli.cjs"
     },
-    "dependencies": {},
+    "dependencies": {
+        "@biger/common": "*",
+        "commander": "^10.0.1"
+    },
     "devDependencies": {
         "@types/node": "^18.0.0",
         "@types/vscode": "~1.67.0",
@@ -80,6 +84,11 @@
                 "command": "biger.diagram.export",
                 "title": "Export diagram to SVG",
                 "category": "ER Diagram"
+            },
+            {
+                "command": "biger.export.sql",
+                "title": "Export SQL",
+                "category": "ER Export"
             }
         ],
         "menus": {
@@ -103,6 +112,10 @@
                 {
                     "command": "biger.diagram.delete",
                     "when": "er-diagram-focused"
+                },
+                {
+                    "command": "biger.export.sql",
+                    "when": "editorLangId == 'entity-relationship'"
                 }
             ],
             "editor/context": [
@@ -110,11 +123,21 @@
                     "command": "biger.diagram.open",
                     "when": "editorLangId == 'entity-relationship'",
                     "group": "navigation"
+                },
+                {
+                    "command": "biger.export.sql",
+                    "when": "editorLangId == 'entity-relationship'",
+                    "group": "navigation"
                 }
             ],
             "editor/title": [
                 {
                     "command": "biger.diagram.open",
+                    "when": "editorLangId == 'entity-relationship'",
+                    "group": "navigation"
+                },
+                {
+                    "command": "biger.export.sql",
                     "when": "editorLangId == 'entity-relationship'",
                     "group": "navigation"
                 }
