@@ -3,10 +3,7 @@
     "languages": [{
         "id": "entity-relationship",
         "grammar": "src/entity-relationship.langium",
-        "fileExtensions": [".er", ".erd"],
-        "textMate": {
-            "out": "../extension/syntaxes/entity-relationship.tmLanguage.json"
-        }
+        "fileExtensions": [".er", ".erd"]
     }],
     "out": "src/generated"
 }
