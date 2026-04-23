@@ -2,7 +2,7 @@
 
 [Langium](https://langium.org/)-based realization of [bigER](https://github.com/borkdominik/bigER).
 
-For information for developers see the [Developer Guide](./DeveloperGuide.md)
+For information for developers see the [Developer Guide](./DEVELOPMENT.md)
 
 ## Getting Started
 
