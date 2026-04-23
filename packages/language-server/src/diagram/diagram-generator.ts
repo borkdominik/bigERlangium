@@ -7,7 +7,7 @@ import { GRAPH_TYPE, RelationshipType } from '@biger/common';
 
 /**
  * Generates a seralizable SModel representation of language elements
- * See: https://sprotty.org/docs/smodel/
+ * See: https://sprotty.org/docs/ref/smodel/
  */
 export class ERDiagramGenerator extends LangiumDiagramGenerator {
 
@@ -17,6 +17,7 @@ export class ERDiagramGenerator extends LangiumDiagramGenerator {
      * @returns graphical model root node
      */
     protected generateRoot(args: GeneratorContext<Model>): SModelRoot {
+        
         const { document } = args;
         const model = document.parseResult.value;
 
@@ -70,7 +71,7 @@ export class ERDiagramGenerator extends LangiumDiagramGenerator {
             children: attributes
         };
         this.traceProvider.trace(attrCompartment, entity, 'attributes');
-        this.markerProvider.addDiagnosticMarker(attrCompartment, entity, ctx);
+        //this.markerProvider.addDiagnosticMarker(attrCompartment, entity, ctx);
 
         const node: SNode = {
             type: 'node:entity',
@@ -308,7 +309,7 @@ export class ERDiagramGenerator extends LangiumDiagramGenerator {
             text: this.attributeDatatypeString(attr)
         }
         
-        if (model.notation?.notationType.UML && !attr.visibility?.VISI_NONE) {
+        if (model.notation?.notationType.UML && attr.visibility != undefined && !attr.visibility?.VISI_NONE) {
             labels.push(visibilityLabel)
             this.traceProvider.trace(visibilityLabel, attr);
         }
